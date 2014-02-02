@@ -1,4 +1,3 @@
-
 # WMGaugeView
 
 * * * * * * * * * * *
@@ -23,4 +22,4 @@ Download or clone the repository and copy the 'WMGaugeView' directory into your 
 
 Copyright William Markezana 2014
 
-Licensed under the GPL v2.
+Licensed under the MIT license.

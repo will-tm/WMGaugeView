@@ -1,15 +1,12 @@
-Pod::Spec.new do |spec|
-  spec.name 			= ‘WMGaugeView'
-  spec.version 			= '0.0.1'
-  spec.summary			= 'Provides a gauge control for ios'
-  spec.platform 		= :ios
-  spec.license			= 'MIT'
-  spec.ios.deployment_target 	= '7.0'
-  spec.authors			= ‘William Markezana'
-  spec.homepage			= 'https://github.com/Will-tm/WMGaugeView'
-  spec.source_files 		= ‘WMGaugeView/*.{h,m}'  
-  spec.source			= { :git => 'https://github.com/Will-tm/WMGaugeView.git', :tag => 'v0.0.1' }
-  spec.framework  = 'UIKit'
-  spec.requires_arc = true
-
+Pod::Spec.new do |s|
+  s.name         = "WMGaugeView"
+  s.version      = "0.0.1"
+  s.summary      = "Highly customizable gauge control for iOS."
+  s.homepage     = "https://github.com/Will-tm/WMGaugeView"
+  s.license      = 'MIT'
+  s.author             = { "William Markezana" => "william.markezana@me.com" }
+  s.source       = { :git => "https://github.com/Will-tm/WMGaugeView.git", :tag => "v0.0.1" }
+  s.source_files  = 'WMGaugeView', 'WMGaugeView/**/*.{h,m}'
+  s.framework  = 'UIKit'
+  s.requires_arc = true
 end

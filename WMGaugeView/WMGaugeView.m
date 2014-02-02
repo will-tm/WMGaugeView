@@ -3,16 +3,6 @@
  *
  * Copyright (C) 2014 William Markezana <william.markezana@me.com>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
  */
 
 #import "WMGaugeView.h"
@@ -67,16 +57,25 @@
     _showInnerBackground = YES;
     _innerRimWidth = 0.05;
     _innerRimBorderWidth = 0.005;
+    _innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleGradient;
     
     _needleWidth = 0.035;
     _needleHeight = 0.34;
     _needleScrewRadius = 0.04;
+    _needleStyle = WMGaugeViewNeedleStyle3D;
+    _needleScrewStyle = WMGaugeViewNeedleScrewStyleGradient;
     
     _scalePosition = 0.025;
     _scaleStartAngle = 30.0;
     _scaleEndAngle = 330.0;
     _scaleDivisions = 12.0;
     _scaleSubdivisions = 10.0;
+    _showScaleShadow = YES;
+    _scalesubdivisionsaligment = WMGaugeViewSubdivisionsAlignmentTop;
+    _scaleDivisionsLength = 0.045;
+    _scaleDivisionsWidth = 0.01;
+    _scaleSubdivisionsLength = 0.015;
+    _scaleSubdivisionsWidth = 0.01;
     
     _value = 0.0;
     _minValue = 0.0;
@@ -91,11 +90,17 @@
     
     background = nil;
     
-    _rangeValues = @[ @50,                  @90,                @130,               @(_maxValue)        ];
-    _rangeColors = @[ RGB(232, 111, 33),    RGB(232, 231, 33),  RGB(27, 202, 33),   RGB(231, 32, 43)    ];
-    _rangeLabels = @[ @"VERY LOW",          @"LOW",             @"OK",              @"OVER FILL"        ];
+    _rangeValues = nil;
+    _rangeColors = nil;
+    _rangeLabels = nil;
     
-    _unitOfMeasurement = @"psi";
+    _scaleDivisionColor = RGB(68, 84, 105);
+    _scaleSubDivisionColor = RGB(217, 217, 217);
+    
+    _scaleFont = nil;
+    
+    _unitOfMeasurement = @"";
+    _showUnitOfMeasurement = NO;
     
     [self initDrawingRects];
     [self initScale];
@@ -155,7 +160,8 @@
     [self drawRim:context];
     if (_showInnerBackground)
         [self drawFace:context];
-    [self drawText:context];
+    if (_showUnitOfMeasurement)
+        [self drawText:context];
     [self drawScale:context];
     [self drawRangeLabels:context];
 }
@@ -167,29 +173,54 @@
 
 - (void)drawFace:(CGContextRef)context
 {
-    // Default Face
-    CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
-    CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(96, 96, 96), iCGRGB(68, 68, 68), iCGRGB(32, 32, 32)], (const CGFloat[]){0.35, 0.96, 0.99});
-    CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-    CGContextAddEllipseInRect(context, faceRect);
-    CGContextClip(context);
-    CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
-    CGGradientRelease(gradient), gradient = NULL;
-
-    // Shadow
-    baseSpace = CGColorSpaceCreateDeviceRGB();
-    gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGBA(40, 96, 170, 60), iCGRGBA(15, 34, 98, 80), iCGRGBA(0, 0, 0, 120), iCGRGBA(0, 0, 0, 140)], (const CGFloat[]){0.60, 0.85, 0.96, 0.99});
-    CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-    CGContextAddEllipseInRect(context, faceRect);
-    CGContextClip(context);
-    CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
-    CGGradientRelease(gradient), gradient = NULL;
-    
-    // Border
-    CGContextSetLineWidth(context, 0.005);
-    CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 160));
-    CGContextAddEllipseInRect(context, faceRect);
-    CGContextStrokePath(context);
+    switch (_innerBackgroundStyle)
+    {
+        case WMGaugeViewInnerBackgroundStyleGradient:
+        {
+            // Default Face
+            CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
+            CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(96, 96, 96), iCGRGB(68, 68, 68), iCGRGB(32, 32, 32)], (const CGFloat[]){0.35, 0.96, 0.99});
+            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
+            CGContextAddEllipseInRect(context, faceRect);
+            CGContextClip(context);
+            CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
+            CGGradientRelease(gradient), gradient = NULL;
+            
+            // Shadow
+            baseSpace = CGColorSpaceCreateDeviceRGB();
+            gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGBA(40, 96, 170, 60), iCGRGBA(15, 34, 98, 80), iCGRGBA(0, 0, 0, 120), iCGRGBA(0, 0, 0, 140)], (const CGFloat[]){0.60, 0.85, 0.96, 0.99});
+            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
+            CGContextAddEllipseInRect(context, faceRect);
+            CGContextClip(context);
+            CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
+            CGGradientRelease(gradient), gradient = NULL;
+            
+            // Border
+            CGContextSetLineWidth(context, 0.005);
+            CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 160));
+            CGContextAddEllipseInRect(context, faceRect);
+            CGContextStrokePath(context);
+        }
+        break;
+        
+        case WMGaugeViewInnerBackgroundStyleFlat:
+        {
+            #define EXTERNAL_RING_RADIUS    0.24
+            #define INTERNAL_RING_RADIUS    0.1
+            
+            CGContextAddEllipseInRect(context, CGRectMake(center.x - EXTERNAL_RING_RADIUS, center.y - EXTERNAL_RING_RADIUS, EXTERNAL_RING_RADIUS * 2.0, EXTERNAL_RING_RADIUS * 2.0));
+            CGContextSetFillColorWithColor(context, CGRGB(255, 104, 97));
+            CGContextFillPath(context);
+            
+            CGContextAddEllipseInRect(context, CGRectMake(center.x - INTERNAL_RING_RADIUS, center.y - INTERNAL_RING_RADIUS, INTERNAL_RING_RADIUS * 2.0, INTERNAL_RING_RADIUS * 2.0));
+            CGContextSetFillColorWithColor(context, CGRGB(242, 99, 92));
+            CGContextFillPath(context);
+        }
+        break;
+            
+        default:
+        break;
+    }
 }
 
 - (void)drawText:(CGContextRef)context
@@ -211,27 +242,31 @@
     int totalTicks = _scaleDivisions * _scaleSubdivisions + 1;
     for (int i = 0; i < totalTicks; i++)
     {
+        CGFloat offset = 0.0;
+        if (_scalesubdivisionsaligment == WMGaugeViewSubdivisionsAlignmentCenter) offset = (_scaleDivisionsLength - _scaleSubdivisionsLength) / 2.0;
+        if (_scalesubdivisionsaligment == WMGaugeViewSubdivisionsAlignmentBottom) offset = _scaleDivisionsLength - _scaleSubdivisionsLength;
+        
         CGFloat y1 = scaleRect.origin.y;
-        CGFloat y2 = y1 + 0.015;
-        CGFloat y3 = y1 + 0.045;
+        CGFloat y2 = y1 + _scaleSubdivisionsLength;
+        CGFloat y3 = y1 + _scaleDivisionsLength;
         
         float value = [self valueForTick:i];
         float div = (_maxValue - _minValue) / _scaleDivisions;
         float mod = (int)value % (int)div;
         
-        UIColor *color = [self rangeColorForValue:value];
-        CGContextSetStrokeColorWithColor(context, color.CGColor);
-        CGContextSetLineWidth(context, 0.01);
-        CGContextMoveToPoint(context, 0.5, y1);
-        CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 2.0);
-        
         if ((abs(mod - 0) < 0.001) || (abs(mod - div) < 0.001))
         {
+            UIColor *color = (_rangeValues && _rangeColors)?[self rangeColorForValue:value]:_scaleDivisionColor;
+            CGContextSetStrokeColorWithColor(context, color.CGColor);
+            CGContextSetLineWidth(context, _scaleDivisionsWidth);
+            CGContextSetShadow(context, CGSizeMake(0.05, 0.05), _showScaleShadow?2.0:0.0);
+            
+            CGContextMoveToPoint(context, 0.5, y1);
             CGContextAddLineToPoint(context, 0.5, y3);
             CGContextStrokePath(context);
             
             NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
-            UIFont* font = [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
+            UIFont* font = _scaleFont?_scaleFont:[UIFont fontWithName:@"Helvetica-Bold" size:0.05];
             NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
             NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
             CGSize fontWidth = [valueString sizeWithAttributes:stringAttrs];
@@ -239,7 +274,14 @@
         }
         else
         {
-            CGContextAddLineToPoint(context, 0.5, y2);
+            UIColor *color = (_rangeValues && _rangeColors)?[self rangeColorForValue:value]:_scaleSubDivisionColor;
+            CGContextSetStrokeColorWithColor(context, color.CGColor);
+            CGContextSetLineWidth(context, _scaleSubdivisionsWidth);
+            CGContextMoveToPoint(context, 0.5, y1);
+            if (_showScaleShadow) CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 2.0);
+            
+            CGContextMoveToPoint(context, 0.5, y1 + offset);
+            CGContextAddLineToPoint(context, 0.5, y2 + offset);
             CGContextStrokePath(context);
         }
         
@@ -260,49 +302,98 @@
     CGContextRotateCTM(context, DEGREES_TO_RADIANS(180 + _scaleStartAngle + currentValue / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle)));
     CGContextTranslateCTM(context, -center.x, -center.y);
     
-    CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 8.0);
-    
-    // Left Needle
-    UIBezierPath *leftNeedlePath = [UIBezierPath bezierPath];
-    [leftNeedlePath moveToPoint:center];
-    [leftNeedlePath addLineToPoint:CGPointMake(center.x - _needleWidth, center.y)];
-    [leftNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
-    [leftNeedlePath addLineToPoint:center];
-    [leftNeedlePath addLineToPoint:CGPointMake(center.x - _needleWidth, center.y)];
-    [leftNeedlePath closePath];
-    [RGB(176, 10, 19) setFill];
-    [leftNeedlePath fill];
-    
-    // Right Needle
-    UIBezierPath *rightNeedlePath = [UIBezierPath bezierPath];
-    [rightNeedlePath moveToPoint:center];
-    [rightNeedlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
-    [rightNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
-    [rightNeedlePath addLineToPoint:center];
-    [rightNeedlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
-    [rightNeedlePath closePath];
-    [RGB(252, 18, 30) setFill];
-    [rightNeedlePath fill];
+    switch (_needleStyle)
+    {
+        case WMGaugeViewNeedleStyle3D:
+        {
+            CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 8.0);
+            
+            // Left Needle
+            UIBezierPath *leftNeedlePath = [UIBezierPath bezierPath];
+            [leftNeedlePath moveToPoint:center];
+            [leftNeedlePath addLineToPoint:CGPointMake(center.x - _needleWidth, center.y)];
+            [leftNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [leftNeedlePath closePath];
+            [RGB(176, 10, 19) setFill];
+            [leftNeedlePath fill];
+            
+            // Right Needle
+            UIBezierPath *rightNeedlePath = [UIBezierPath bezierPath];
+            [rightNeedlePath moveToPoint:center];
+            [rightNeedlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
+            [rightNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [rightNeedlePath closePath];
+            [RGB(252, 18, 30) setFill];
+            [rightNeedlePath fill];
+        }
+        break;
+            
+        case WMGaugeViewNeedleStyleFlatThin:
+        {
+            UIBezierPath *needlePath = [UIBezierPath bezierPath];
+            [needlePath moveToPoint:CGPointMake(center.x - _needleWidth, center.y)];
+            [needlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
+            [needlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [needlePath closePath];
+            
+            #define SHADOW_OFFSET  0.008
+            CGContextTranslateCTM(context, -SHADOW_OFFSET, -SHADOW_OFFSET);
+            [RGBA(0, 0, 0, 40) setFill];
+            [RGBA(0, 0, 0, 20) setStroke];
+            [needlePath fill];
+            needlePath.lineWidth = 0.004;
+            [needlePath stroke];
+            CGContextTranslateCTM(context, SHADOW_OFFSET, SHADOW_OFFSET);
+            
+            [RGB(255, 104, 97) setFill];
+            [RGB(255, 104, 97) setStroke];
+            [needlePath fill];
+            needlePath.lineWidth = 0.004;
+            [needlePath stroke];
+        }
+        break;
+            
+        default:
+        break;
+    }
 
     [self drawNeedleScrew:context];
 }
 
 - (void)drawNeedleScrew:(CGContextRef)context
 {
-    // Screw
-    CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
-    CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(171, 171, 171), iCGRGB(255, 255, 255), iCGRGB(171, 171, 171)], (const CGFloat[]){0.05, 0.9, 1.00});
-    CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-    CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-    CGContextClip(context);
-    CGContextDrawRadialGradient(context, gradient, center, 0, center, _needleScrewRadius * 2.0, kCGGradientDrawsAfterEndLocation);
-    CGGradientRelease(gradient), gradient = NULL;
-    
-    // Border
-    CGContextSetLineWidth(context, 0.005);
-    CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 100));
-    CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-    CGContextStrokePath(context);
+    switch (_needleScrewStyle)
+    {
+        case WMGaugeViewNeedleScrewStyleGradient:
+        {
+            // Screw
+            CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
+            CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(171, 171, 171), iCGRGB(255, 255, 255), iCGRGB(171, 171, 171)], (const CGFloat[]){0.05, 0.9, 1.00});
+            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
+            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
+            CGContextClip(context);
+            CGContextDrawRadialGradient(context, gradient, center, 0, center, _needleScrewRadius * 2.0, kCGGradientDrawsAfterEndLocation);
+            CGGradientRelease(gradient), gradient = NULL;
+            
+            // Border
+            CGContextSetLineWidth(context, 0.005);
+            CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 100));
+            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
+            CGContextStrokePath(context);
+        }
+        break;
+            
+        case WMGaugeViewNeedleScrewStylePlain:
+        {
+            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
+            CGContextSetFillColorWithColor(context, CGRGB(68, 84, 105));
+            CGContextFillPath(context);
+        }
+        break;
+            
+        default:
+        break;
+    }
 }
 
 - (void)initScale
@@ -310,7 +401,7 @@
     scaleRotation = (int)(_scaleStartAngle + 180) % 360;
     divisionValue = (_maxValue - _minValue) / _scaleDivisions;
     subdivisionValue = divisionValue / _scaleSubdivisions;
-    subdivisionAngle = (360 - 2 * _scaleStartAngle) / (_scaleDivisions * _scaleSubdivisions);
+    subdivisionAngle = (_scaleEndAngle - _scaleStartAngle) / (_scaleDivisions * _scaleSubdivisions);
 }
 
 - (float)valueForTick:(int)tick
@@ -428,6 +519,12 @@
     [self invalidateBackground];
 }
 
+- (void)setInnerBackgroundStyle:(WMGaugeViewInnerBackgroundStyle)innerBackgroundStyle
+{
+    _innerBackgroundStyle = innerBackgroundStyle;
+    [self invalidateBackground];
+}
+
 - (void)setNeedleWidth:(CGFloat)needleWidth
 {
     _needleWidth = needleWidth;
@@ -443,6 +540,18 @@
 - (void)setNeedleScrewRadius:(CGFloat)needleScrewRadius
 {
     _needleScrewRadius = needleScrewRadius;
+    [self setNeedsDisplay];
+}
+
+- (void)setNeedleStyle:(WMGaugeViewNeedleStyle)needleStyle
+{
+    _needleStyle = needleStyle;
+    [self setNeedsDisplay];
+}
+
+- (void)setNeedleScrewStyle:(WMGaugeViewNeedleScrewStyle)needleScrewStyle
+{
+    _needleScrewStyle = needleScrewStyle;
     [self setNeedsDisplay];
 }
 
@@ -473,6 +582,60 @@
 - (void)setScaleSubdivisions:(CGFloat)scaleSubdivisions
 {
     _scaleSubdivisions = scaleSubdivisions;
+    [self invalidateBackground];
+}
+
+- (void)setShowScaleShadow:(bool)showScaleShadow
+{
+    _showScaleShadow = showScaleShadow;
+    [self invalidateBackground];
+}
+
+- (void)setScalesubdivisionsaligment:(WMGaugeViewSubdivisionsAlignment)scalesubdivisionsaligment
+{
+    _scalesubdivisionsaligment = scalesubdivisionsaligment;
+    [self invalidateBackground];
+}
+
+- (void)setScaleDivisionsLength:(CGFloat)scaleDivisionsLength
+{
+    _scaleDivisionsLength = scaleDivisionsLength;
+    [self invalidateBackground];
+}
+
+- (void)setScaleDivisionsWidth:(CGFloat)scaleDivisionsWidth
+{
+    _scaleDivisionsWidth = scaleDivisionsWidth;
+    [self invalidateBackground];
+}
+
+- (void)setScaleSubdivisionsLength:(CGFloat)scaleSubdivisionsLength
+{
+    _scaleSubdivisionsLength = scaleSubdivisionsLength;
+    [self invalidateBackground];
+}
+
+- (void)setScaleSubdivisionsWidth:(CGFloat)scaleSubdivisionsWidth
+{
+    _scaleSubdivisionsWidth = scaleSubdivisionsWidth;
+    [self invalidateBackground];
+}
+
+- (void)setScaleDivisionColor:(UIColor *)scaleDivisionColor
+{
+    _scaleDivisionColor = scaleDivisionColor;
+    [self invalidateBackground];
+}
+
+- (void)setScaleSubDivisionColor:(UIColor *)scaleSubDivisionColor
+{
+    _scaleSubDivisionColor = scaleSubDivisionColor;
+    [self invalidateBackground];
+}
+
+- (void)setScaleFont:(UIFont *)scaleFont
+{
+    _scaleFont = scaleFont;
     [self invalidateBackground];
 }
 
@@ -515,6 +678,12 @@
 - (void)setUnitOfMeasurement:(NSString *)unitOfMeasurement
 {
     _unitOfMeasurement = unitOfMeasurement;
+    [self invalidateBackground];
+}
+
+- (void)setShowUnitOfMeasurement:(bool)showUnitOfMeasurement
+{
+    _showUnitOfMeasurement = showUnitOfMeasurement;
     [self invalidateBackground];
 }
 

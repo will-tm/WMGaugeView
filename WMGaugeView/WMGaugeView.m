@@ -299,7 +299,7 @@
 - (void)drawNeedle:(CGContextRef)context
 {
     CGContextTranslateCTM(context, center.x, center.y);
-    CGContextRotateCTM(context, DEGREES_TO_RADIANS(180 + _scaleStartAngle + currentValue / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle)));
+    CGContextRotateCTM(context, DEGREES_TO_RADIANS(180 + _scaleStartAngle + (currentValue - _minValue) / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle)));
     CGContextTranslateCTM(context, -center.x, -center.y);
     
     switch (_needleStyle)
@@ -406,7 +406,7 @@
 
 - (float)valueForTick:(int)tick
 {
-    return tick * (divisionValue / _scaleSubdivisions);
+    return tick * (divisionValue / _scaleSubdivisions) + _minValue;
 }
 
 - (void)computeCurrentValue

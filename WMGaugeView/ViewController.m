@@ -25,6 +25,7 @@
     [super viewDidLoad];
     
     _gaugeView.maxValue = 240.0;
+    _gaugeView.showRangeLabels = YES;
     _gaugeView.rangeValues = @[ @50,                  @90,                @130,               @240.0              ];
     _gaugeView.rangeColors = @[ RGB(232, 111, 33),    RGB(232, 231, 33),  RGB(27, 202, 33),   RGB(231, 32, 43)    ];
     _gaugeView.rangeLabels = @[ @"VERY LOW",          @"LOW",             @"OK",              @"OVER FILL"        ];

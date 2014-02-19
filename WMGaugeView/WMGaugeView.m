@@ -82,14 +82,14 @@
     _maxValue = 240.0;
     currentValue = 0.0;
     
-    _rangeLabelsWidth = 0.0;
-    
     needleVelocity = 0.0;
     needleAcceleration = 0.0;
     needleLastMoved = -1;
     
     background = nil;
     
+    _showRangeLabels = NO;
+    _rangeLabelsWidth = 0.05;
     _rangeValues = nil;
     _rangeColors = nil;
     _rangeLabels = nil;
@@ -123,14 +123,21 @@
                           innerRimRect.origin.y + _innerRimWidth,
                           innerRimRect.size.width - 2 * _innerRimWidth,
                           innerRimRect.size.height - 2 * _innerRimWidth);
-    rangeLabelsRect = CGRectMake(faceRect.origin.x + _rangeLabelsWidth,
-                                 faceRect.origin.y + _rangeLabelsWidth,
-                                 faceRect.size.width - 2 * _rangeLabelsWidth,
-                                 faceRect.size.height - 2 * _rangeLabelsWidth);
+    rangeLabelsRect = CGRectMake(faceRect.origin.x + (_showRangeLabels ? _rangeLabelsWidth : 0.0),
+                                 faceRect.origin.y + (_showRangeLabels ? _rangeLabelsWidth : 0.0),
+                                 faceRect.size.width - 2 * (_showRangeLabels ? _rangeLabelsWidth : 0.0),
+                                 faceRect.size.height - 2 * (_showRangeLabels ? _rangeLabelsWidth : 0.0));
     scaleRect = CGRectMake(rangeLabelsRect.origin.x + _scalePosition,
                            rangeLabelsRect.origin.y + _scalePosition,
                            rangeLabelsRect.size.width - 2 * _scalePosition,
                            rangeLabelsRect.size.height - 2 * _scalePosition);
+}
+
+- (void)rotateContext:(CGContextRef)context fromCenter:(CGPoint)center_ withAngle:(CGFloat)angle
+{
+    CGContextTranslateCTM(context, center_.x, center_.y);
+    CGContextRotateCTM(context, angle);
+    CGContextTranslateCTM(context, -center_.x, -center_.y);
 }
 
 - (void)drawRect:(CGRect)rect
@@ -163,7 +170,8 @@
     if (_showUnitOfMeasurement)
         [self drawText:context];
     [self drawScale:context];
-    [self drawRangeLabels:context];
+    if (_showRangeLabels)
+        [self drawRangeLabels:context];
 }
 
 - (void)drawRim:(CGContextRef)context
@@ -235,9 +243,9 @@
 
 - (void)drawScale:(CGContextRef)context
 {
-    CGContextTranslateCTM(context, center.x, center.y);
-    CGContextRotateCTM(context, DEGREES_TO_RADIANS(180 + _scaleStartAngle));
-    CGContextTranslateCTM(context, -center.x, -center.y);
+    
+    CGContextSaveGState(context);
+    [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(180 + _scaleStartAngle)];
     
     int totalTicks = _scaleDivisions * _scaleSubdivisions + 1;
     for (int i = 0; i < totalTicks; i++)
@@ -285,22 +293,73 @@
             CGContextStrokePath(context);
         }
         
-        CGContextTranslateCTM(context, center.x, center.y);
-        CGContextRotateCTM(context, DEGREES_TO_RADIANS(subdivisionAngle));
-        CGContextTranslateCTM(context, -center.x, -center.y);
+        [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(subdivisionAngle)];
     }
+    CGContextRestoreGState(context);
+    
+}
+
+- (void) drawStringAtContext:(CGContextRef) context string:(NSString*)text withCenter:(CGPoint)center_ radius:(CGFloat)radius startAngle:(CGFloat)startAngle endAngle:(CGFloat)endAngle
+{
+    CGContextSaveGState(context);
+    
+    UIFont* font = _scaleFont?_scaleFont:[UIFont fontWithName:@"Helvetica" size:0.05];
+    NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
+    CGSize textSize = [text sizeWithAttributes:stringAttrs];
+ 
+    float perimeter = 2 * M_PI * radius;
+    float textAngle = textSize.width / perimeter * 2 * M_PI;
+    float offset = ((endAngle - startAngle) - textAngle) / 2.0;
+
+    [self rotateContext:context fromCenter:center withAngle:M_PI_2 + startAngle + offset];
+    for (int index = 0; index < [text length]; index++)
+    {
+        NSRange range = {index, 1};
+        NSString* letter = [text substringWithRange:range];
+        NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:letter attributes:stringAttrs];
+        CGSize charSize = [letter sizeWithAttributes:stringAttrs];
+  
+        float letterAngle = (charSize.width * 1.1 / perimeter * 2 * M_PI);
+        
+        [attrStr drawAtPoint:CGPointMake(0.5 - charSize.width/2.0, 0.5 - radius - charSize.height / 2.0)];
+        [self rotateContext:context fromCenter:center withAngle:letterAngle];
+    }
+    CGContextRestoreGState(context);
 }
 
 - (void)drawRangeLabels:(CGContextRef)context
 {
+    CGContextSaveGState(context);
+    [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(90 + _scaleStartAngle)];
+    CGContextSetShadow(context, CGSizeMake(0.0, 0.0), 0.0);
     
+    CGFloat maxAngle = _scaleEndAngle - _scaleStartAngle;
+    CGFloat lastStartAngle = 0.0f;
+
+    for (int i = 0; i < _rangeValues.count; i ++)
+    {
+        float value = ((NSNumber*)[_rangeValues objectAtIndex:i]).floatValue;
+        float valueAngle = value / (_maxValue - _minValue) * maxAngle;
+        
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        [path addArcWithCenter:center radius:rangeLabelsRect.size.width / 2.0 + 0.01 startAngle:DEGREES_TO_RADIANS(lastStartAngle) endAngle:DEGREES_TO_RADIANS(valueAngle) clockwise:YES];
+        
+        UIColor *color = _rangeColors[i];
+        [color setStroke];
+        path.lineWidth = _rangeLabelsWidth;
+        [path stroke];
+        
+        [self drawStringAtContext:context string:(NSString*)_rangeLabels[i] withCenter:center radius:rangeLabelsRect.size.width / 2.0 + 0.008 startAngle:DEGREES_TO_RADIANS(lastStartAngle) endAngle:DEGREES_TO_RADIANS(valueAngle)];
+        
+        lastStartAngle = valueAngle;
+    }
+    
+    CGContextRestoreGState(context);
 }
 
 - (void)drawNeedle:(CGContextRef)context
 {
-    CGContextTranslateCTM(context, center.x, center.y);
-    CGContextRotateCTM(context, DEGREES_TO_RADIANS(180 + _scaleStartAngle + (currentValue - _minValue) / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle)));
-    CGContextTranslateCTM(context, -center.x, -center.y);
+    [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(180 + _scaleStartAngle + (currentValue - _minValue) / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle))];
     
     switch (_needleStyle)
     {
@@ -684,6 +743,12 @@
 - (void)setShowUnitOfMeasurement:(bool)showUnitOfMeasurement
 {
     _showUnitOfMeasurement = showUnitOfMeasurement;
+    [self invalidateBackground];
+}
+
+- (void)setShowRangeLabels:(bool)showRangeLabels
+{
+    _showRangeLabels = showRangeLabels;
     [self invalidateBackground];
 }
 

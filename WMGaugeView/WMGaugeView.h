@@ -73,6 +73,7 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic) float minValue;
 @property (nonatomic) float maxValue;
 
+@property (nonatomic) bool showRangeLabels;
 @property (nonatomic, strong) NSArray *rangeValues;
 @property (nonatomic, strong) NSArray *rangeColors;
 @property (nonatomic, strong) NSArray *rangeLabels;

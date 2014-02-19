@@ -254,7 +254,7 @@
         float div = (_maxValue - _minValue) / _scaleDivisions;
         float mod = (int)value % (int)div;
         
-        if ((abs(mod - 0) < 0.001) || (abs(mod - div) < 0.001))
+        if ((abs(mod - 0) < 0.000001) || (abs(mod - div) < 0.000001))
         {
             UIColor *color = (_rangeValues && _rangeColors)?[self rangeColorForValue:value]:_scaleDivisionColor;
             CGContextSetStrokeColorWithColor(context, color.CGColor);

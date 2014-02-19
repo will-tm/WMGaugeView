@@ -139,7 +139,7 @@
     
     if (background == nil)
     {
-        UIGraphicsBeginImageContext(rect.size);
+        UIGraphicsBeginImageContextWithOptions(rect.size, NO, [UIScreen mainScreen].scale);
         CGContextRef context = UIGraphicsGetCurrentContext();
         CGContextScaleCTM(context, rect.size.width , rect.size.height);
         [self drawGauge:context];

@@ -339,7 +339,7 @@
     for (int i = 0; i < _rangeValues.count; i ++)
     {
         float value = ((NSNumber*)[_rangeValues objectAtIndex:i]).floatValue;
-        float valueAngle = value / (_maxValue - _minValue) * maxAngle;
+        float valueAngle = (value - _minValue) / (_maxValue - _minValue) * maxAngle;
         
         UIBezierPath *path = [UIBezierPath bezierPath];
         [path addArcWithCenter:center radius:rangeLabelsRect.size.width / 2.0 + 0.01 startAngle:DEGREES_TO_RADIANS(lastStartAngle) endAngle:DEGREES_TO_RADIANS(valueAngle) clockwise:YES];

@@ -470,21 +470,18 @@
 
 - (void)computeCurrentValue
 {
-    if (!(abs(currentValue - _value) > 0.1))
-    {
+    if (currentValue == _value)
         return;
-    }
-
+    
     if (-1 != needleLastMoved)
     {
         NSTimeInterval time = ([[NSDate date] timeIntervalSince1970] - needleLastMoved);
-        double direction = (needleVelocity < 0.0) ? -1.0 : ((needleVelocity > 0.0) ? 1.0 : 0.0);
- 
+
         needleAcceleration = 5.0 * (_value - currentValue);
         currentValue += needleVelocity * time;
         needleVelocity += needleAcceleration * time * 2.0;
         
-        if ((_value - currentValue) * direction < 0.1 * direction)
+        if (fabs(_value - currentValue) < (_maxValue - _minValue) * 0.01)
         {
             currentValue = _value;
             needleVelocity = 0.0;

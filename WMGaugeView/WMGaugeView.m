@@ -90,6 +90,7 @@
     
     _showRangeLabels = NO;
     _rangeLabelsWidth = 0.05;
+    _rangeLabelsFontKerning = 1.0;
     _rangeValues = nil;
     _rangeColors = nil;
     _rangeLabels = nil;
@@ -308,10 +309,13 @@
     CGSize textSize = [text sizeWithAttributes:stringAttrs];
  
     float perimeter = 2 * M_PI * radius;
-    float textAngle = textSize.width / perimeter * 2 * M_PI;
+    float textAngle = textSize.width / perimeter * 2 * M_PI * _rangeLabelsFontKerning;
     float offset = ((endAngle - startAngle) - textAngle) / 2.0;
 
-    [self rotateContext:context fromCenter:center withAngle:M_PI_2 + startAngle + offset];
+    float letterPosition = 0;
+    NSString *lastLetter = @"";
+    
+    [self rotateContext:context fromCenter:center withAngle:startAngle + offset];
     for (int index = 0; index < [text length]; index++)
     {
         NSRange range = {index, 1};
@@ -319,10 +323,27 @@
         NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:letter attributes:stringAttrs];
         CGSize charSize = [letter sizeWithAttributes:stringAttrs];
   
-        float letterAngle = (charSize.width * 1.1 / perimeter * 2 * M_PI);
+        float totalWidth = [[NSString stringWithFormat:@"%@%@", lastLetter, letter] sizeWithAttributes:stringAttrs].width;
+        float currentLetterWidth = [letter sizeWithAttributes:stringAttrs].width;
+        float lastLetterWidth = [lastLetter sizeWithAttributes:stringAttrs].width;
+        float kerning = (lastLetterWidth) ? 0 : ((currentLetterWidth + lastLetterWidth) - totalWidth);
         
-        [attrStr drawAtPoint:CGPointMake(0.5 - charSize.width/2.0, 0.5 - radius - charSize.height / 2.0)];
-        [self rotateContext:context fromCenter:center withAngle:letterAngle];
+        letterPosition += (charSize.width / 2) - kerning;
+        float angle = (letterPosition / perimeter * 2 * M_PI) * _rangeLabelsFontKerning;
+        CGPoint letterPoint = CGPointMake((radius - charSize.height / 2.0) * cos(angle) + center_.x, (radius - charSize.height / 2.0) * sin(angle) + center_.y);
+        
+        CGContextSaveGState(context);
+        CGContextTranslateCTM(context, letterPoint.x, letterPoint.y);
+        CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(angle + M_PI_2);
+        CGContextConcatCTM(context, rotationTransform);
+        CGContextTranslateCTM(context, -letterPoint.x, -letterPoint.y);
+
+        [attrStr drawAtPoint:CGPointMake(letterPoint.x - charSize.width/2 , letterPoint.y - charSize.height)];
+        
+        CGContextRestoreGState(context);
+        
+        letterPosition += charSize.width / 2;
+        lastLetter = letter;
     }
     CGContextRestoreGState(context);
 }
@@ -746,6 +767,12 @@
 - (void)setShowRangeLabels:(bool)showRangeLabels
 {
     _showRangeLabels = showRangeLabels;
+    [self invalidateBackground];
+}
+
+- (void)setRangeLabelsFontKerning:(CGFloat)rangeLabelsFontKerning
+{
+    _rangeLabelsFontKerning = rangeLabelsFontKerning;
     [self invalidateBackground];
 }
 

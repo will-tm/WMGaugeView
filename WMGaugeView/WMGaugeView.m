@@ -31,9 +31,7 @@
     CGFloat divisionValue;
     CGFloat subdivisionValue;
     CGFloat subdivisionAngle;
-    double currentAngle;
     UIImage *background;
-    CALayer *contentLayer;
     CALayer *rootNeedleLayer;
 }
 
@@ -81,7 +79,6 @@
     _value = 0.0;
     _minValue = 0.0;
     _maxValue = 240.0;
-    currentAngle = 0.0;
 
     background = nil;
     
@@ -102,7 +99,7 @@
     _unitOfMeasurementFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
-    
+
     [self initDrawingRects];
     [self initScale];
 }
@@ -157,22 +154,14 @@
     
     if (rootNeedleLayer == nil)
     {
-        contentLayer = [CALayer new];
-        contentLayer.frame = self.bounds;
-        //contentLayer.transform = CATransform3DMakeScale(self.bounds.size.width, self.bounds.size.height, 1);
-        [self.layer addSublayer:contentLayer];
-        
         rootNeedleLayer = [CALayer new];
-        rootNeedleLayer.frame = contentLayer.frame;
-        [contentLayer addSublayer:rootNeedleLayer];
+        rootNeedleLayer.frame = self.bounds;
+        [self.layer addSublayer:rootNeedleLayer];
         
         [self drawNeedle];
         [self drawNeedleScrew];
         
-        [CATransaction begin];
-        [CATransaction setValue:[NSNumber numberWithFloat:0.0] forKey:kCATransactionAnimationDuration];
-        rootNeedleLayer.transform = CATransform3DMakeRotation([self needleAngleForValue:_value], 0, 0, 1.0);
-        [CATransaction commit];
+        [self setValue:_value animated:NO];
     }
     
 }
@@ -433,7 +422,7 @@
             [rootNeedleLayer setShadowColor:[[UIColor blackColor] CGColor]];
             [rootNeedleLayer setShadowOffset:CGSizeMake(0, 0)];
             [rootNeedleLayer setShadowOpacity:0.5];
-            [rootNeedleLayer setShadowRadius:0.01];
+            [rootNeedleLayer setShadowRadius:2.0];
         }
         break;
             
@@ -454,7 +443,7 @@
             
             needleLayer.shadowColor = [[UIColor blackColor] CGColor];
             needleLayer.shadowOffset = CGSizeMake(-2.0, -2.0);
-            needleLayer.shadowOpacity = 0.16;
+            needleLayer.shadowOpacity = 0.2;
             needleLayer.shadowRadius = 1.2;
             
             [rootNeedleLayer addSublayer:needleLayer];

@@ -491,9 +491,14 @@
     return tick * (divisionValue / _scaleSubdivisions) + _minValue;
 }
 
+- (BOOL)valueHasReachedTarget
+{
+    return (fabs(_value - currentValue) < (_maxValue - _minValue) * 0.01);
+}
+
 - (void)computeCurrentValue
 {
-    if (currentValue == _value)
+    if ([self valueHasReachedTarget])
         return;
     
     if (-1 != needleLastMoved)
@@ -504,7 +509,7 @@
         currentValue += needleVelocity * time;
         needleVelocity += needleAcceleration * time * 2.0;
         
-        if (fabs(_value - currentValue) < (_maxValue - _minValue) * 0.01)
+        if ([self valueHasReachedTarget])
         {
             currentValue = _value;
             needleVelocity = 0.0;

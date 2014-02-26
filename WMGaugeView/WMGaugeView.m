@@ -16,6 +16,8 @@
 #define CGRGBA(r,g,b,a) RGBA(r,g,b,a).CGColor
 #define iCGRGBA(r,g,b,a) (id)CGRGBA(r,g,b,a)
 
+#define FULL_SCALE(x,y)    (x)*self.bounds.size.width, (y)*self.bounds.size.height
+
 @implementation WMGaugeView
 {
     CGRect fullRect;
@@ -29,11 +31,10 @@
     CGFloat divisionValue;
     CGFloat subdivisionValue;
     CGFloat subdivisionAngle;
-    double currentValue;
-    double needleAcceleration;
-    double needleVelocity;
-    NSTimeInterval needleLastMoved;
+    double currentAngle;
     UIImage *background;
+    CALayer *contentLayer;
+    CALayer *rootNeedleLayer;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -80,12 +81,8 @@
     _value = 0.0;
     _minValue = 0.0;
     _maxValue = 240.0;
-    currentValue = 0.0;
-    
-    needleVelocity = 0.0;
-    needleAcceleration = 0.0;
-    needleLastMoved = -1;
-    
+    currentAngle = 0.0;
+
     background = nil;
     
     _showRangeLabels = NO;
@@ -146,8 +143,6 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    [self computeCurrentValue];
-    
     if (background == nil)
     {
         UIGraphicsBeginImageContextWithOptions(rect.size, NO, [UIScreen mainScreen].scale);
@@ -160,10 +155,26 @@
     
     [background drawInRect:rect];
     
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextScaleCTM(context, rect.size.width , rect.size.height);
+    if (rootNeedleLayer == nil)
+    {
+        contentLayer = [CALayer new];
+        contentLayer.frame = self.bounds;
+        //contentLayer.transform = CATransform3DMakeScale(self.bounds.size.width, self.bounds.size.height, 1);
+        [self.layer addSublayer:contentLayer];
+        
+        rootNeedleLayer = [CALayer new];
+        rootNeedleLayer.frame = contentLayer.frame;
+        [contentLayer addSublayer:rootNeedleLayer];
+        
+        [self drawNeedle];
+        [self drawNeedleScrew];
+        
+        [CATransaction begin];
+        [CATransaction setValue:[NSNumber numberWithFloat:0.0] forKey:kCATransactionAnimationDuration];
+        rootNeedleLayer.transform = CATransform3DMakeRotation([self needleAngleForValue:_value], 0, 0, 1.0);
+        [CATransaction commit];
+    }
     
-    [self drawNeedle:context];
 }
 
 - (void)drawGauge:(CGContextRef)context
@@ -380,96 +391,118 @@
     CGContextRestoreGState(context);
 }
 
-- (void)drawNeedle:(CGContextRef)context
+- (CGFloat)needleAngleForValue:(double)value
 {
-    [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(180 + _scaleStartAngle + (currentValue - _minValue) / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle))];
-    
+    return DEGREES_TO_RADIANS(_scaleStartAngle + (value - _minValue) / (_maxValue - _minValue) * (_scaleEndAngle - _scaleStartAngle)) + M_PI;
+}
+
+- (void)drawNeedle
+{
     switch (_needleStyle)
     {
         case WMGaugeViewNeedleStyle3D:
         {
-            CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 8.0);
-            
             // Left Needle
+            CAShapeLayer *leftNeedleLayer = [CAShapeLayer layer];
             UIBezierPath *leftNeedlePath = [UIBezierPath bezierPath];
-            [leftNeedlePath moveToPoint:center];
-            [leftNeedlePath addLineToPoint:CGPointMake(center.x - _needleWidth, center.y)];
-            [leftNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [leftNeedlePath moveToPoint:CGPointMake(FULL_SCALE(center.x, center.y))];
+            [leftNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x - _needleWidth, center.y))];
+            [leftNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
             [leftNeedlePath closePath];
-            [RGB(176, 10, 19) setFill];
-            [leftNeedlePath fill];
+
+            leftNeedleLayer.path = leftNeedlePath.CGPath;
+            leftNeedleLayer.backgroundColor = [[UIColor clearColor] CGColor];
+            leftNeedleLayer.fillColor = CGRGB(176, 10, 19);
+ 
+            [rootNeedleLayer addSublayer:leftNeedleLayer];
             
             // Right Needle
+            CAShapeLayer *rightNeedleLayer = [CAShapeLayer layer];
             UIBezierPath *rightNeedlePath = [UIBezierPath bezierPath];
-            [rightNeedlePath moveToPoint:center];
-            [rightNeedlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
-            [rightNeedlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [rightNeedlePath moveToPoint:CGPointMake(FULL_SCALE(center.x, center.y))];
+            [rightNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x + _needleWidth, center.y))];
+            [rightNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
             [rightNeedlePath closePath];
-            [RGB(252, 18, 30) setFill];
-            [rightNeedlePath fill];
+ 
+            rightNeedleLayer.path = rightNeedlePath.CGPath;
+            rightNeedleLayer.backgroundColor = [[UIColor clearColor] CGColor];
+            rightNeedleLayer.fillColor = CGRGB(252, 18, 30);
+            
+            [rootNeedleLayer addSublayer:rightNeedleLayer];
+            
+            [rootNeedleLayer setShadowColor:[[UIColor blackColor] CGColor]];
+            [rootNeedleLayer setShadowOffset:CGSizeMake(0, 0)];
+            [rootNeedleLayer setShadowOpacity:0.5];
+            [rootNeedleLayer setShadowRadius:0.01];
         }
         break;
             
         case WMGaugeViewNeedleStyleFlatThin:
         {
+            CAShapeLayer *needleLayer = [CAShapeLayer layer];
             UIBezierPath *needlePath = [UIBezierPath bezierPath];
-            [needlePath moveToPoint:CGPointMake(center.x - _needleWidth, center.y)];
-            [needlePath addLineToPoint:CGPointMake(center.x + _needleWidth, center.y)];
-            [needlePath addLineToPoint:CGPointMake(center.x, center.x - _needleHeight)];
+            [needlePath moveToPoint:CGPointMake(FULL_SCALE(center.x - _needleWidth, center.y))];
+            [needlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x + _needleWidth, center.y))];
+            [needlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
             [needlePath closePath];
+
+            needleLayer.path = needlePath.CGPath;
+            needleLayer.backgroundColor = [[UIColor clearColor] CGColor];
+            needleLayer.fillColor = CGRGB(255, 104, 97);
+            needleLayer.strokeColor = CGRGB(255, 104, 97);
+            needleLayer.lineWidth = 1.2;
             
-            #define SHADOW_OFFSET  0.008
-            CGContextTranslateCTM(context, -SHADOW_OFFSET, -SHADOW_OFFSET);
-            [RGBA(0, 0, 0, 40) setFill];
-            [RGBA(0, 0, 0, 20) setStroke];
-            [needlePath fill];
-            needlePath.lineWidth = 0.004;
-            [needlePath stroke];
-            CGContextTranslateCTM(context, SHADOW_OFFSET, SHADOW_OFFSET);
+            needleLayer.shadowColor = [[UIColor blackColor] CGColor];
+            needleLayer.shadowOffset = CGSizeMake(-2.0, -2.0);
+            needleLayer.shadowOpacity = 0.16;
+            needleLayer.shadowRadius = 1.2;
             
-            [RGB(255, 104, 97) setFill];
-            [RGB(255, 104, 97) setStroke];
-            [needlePath fill];
-            needlePath.lineWidth = 0.004;
-            [needlePath stroke];
+            [rootNeedleLayer addSublayer:needleLayer];
         }
         break;
             
         default:
         break;
     }
-
-    [self drawNeedleScrew:context];
 }
 
-- (void)drawNeedleScrew:(CGContextRef)context
+- (void)drawNeedleScrew
 {
     switch (_needleScrewStyle)
     {
         case WMGaugeViewNeedleScrewStyleGradient:
         {
-            // Screw
-            CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
-            CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(171, 171, 171), iCGRGB(255, 255, 255), iCGRGB(171, 171, 171)], (const CGFloat[]){0.05, 0.9, 1.00});
-            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-            CGContextClip(context);
-            CGContextDrawRadialGradient(context, gradient, center, 0, center, _needleScrewRadius * 2.0, kCGGradientDrawsAfterEndLocation);
-            CGGradientRelease(gradient), gradient = NULL;
+            CAShapeLayer *screwLayer = [CAShapeLayer layer];
+            screwLayer.bounds = CGRectMake(FULL_SCALE(center.x - _needleScrewRadius, center.y - _needleScrewRadius), FULL_SCALE(_needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
+            screwLayer.position = CGPointMake(FULL_SCALE(center.x, center.y));
+            screwLayer.path = [UIBezierPath bezierPathWithOvalInRect:screwLayer.bounds].CGPath;
+            screwLayer.fillColor = CGRGB(171, 171, 171);
+            screwLayer.strokeColor = CGRGBA(81, 84, 89, 100);
+            screwLayer.lineWidth = 1.5;
             
-            // Border
-            CGContextSetLineWidth(context, 0.005);
-            CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 100));
-            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-            CGContextStrokePath(context);
+            screwLayer.shadowColor = [[UIColor blackColor] CGColor];
+            screwLayer.shadowOffset = CGSizeMake(0.0, 0.0);
+            screwLayer.shadowOpacity = 0.1;
+            screwLayer.shadowRadius = 2.0;
+            
+            [rootNeedleLayer addSublayer:screwLayer];
         }
         break;
             
         case WMGaugeViewNeedleScrewStylePlain:
         {
-            CGContextAddEllipseInRect(context, CGRectMake(center.x - _needleScrewRadius, center.y - _needleScrewRadius, _needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-            CGContextSetFillColorWithColor(context, CGRGB(68, 84, 105));
-            CGContextFillPath(context);
+            CAShapeLayer *screwLayer = [CAShapeLayer layer];
+            screwLayer.bounds = CGRectMake(FULL_SCALE(center.x - _needleScrewRadius, center.y - _needleScrewRadius), FULL_SCALE(_needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
+            screwLayer.position = CGPointMake(FULL_SCALE(center.x, center.y));
+            screwLayer.path = [UIBezierPath bezierPathWithOvalInRect:screwLayer.bounds].CGPath;
+            screwLayer.fillColor = CGRGB(68, 84, 105);
+            
+            screwLayer.shadowColor = [[UIColor blackColor] CGColor];
+            screwLayer.shadowOffset = CGSizeMake(0.0, 0.0);
+            screwLayer.shadowOpacity = 0.2;
+            screwLayer.shadowRadius = 2.0;
+            
+            [rootNeedleLayer addSublayer:screwLayer];
         }
         break;
             
@@ -489,48 +522,6 @@
 - (float)valueForTick:(int)tick
 {
     return tick * (divisionValue / _scaleSubdivisions) + _minValue;
-}
-
-- (BOOL)valueHasReachedTarget
-{
-    return (fabs(_value - currentValue) < (_maxValue - _minValue) * 0.01);
-}
-
-- (void)computeCurrentValue
-{
-    if ([self valueHasReachedTarget])
-        return;
-    
-    if (-1 != needleLastMoved)
-    {
-        NSTimeInterval time = ([[NSDate date] timeIntervalSince1970] - needleLastMoved);
-
-        needleAcceleration = 5.0 * (_value - currentValue);
-        currentValue += needleVelocity * time;
-        needleVelocity += needleAcceleration * time * 2.0;
-        
-        if ([self valueHasReachedTarget])
-        {
-            currentValue = _value;
-            needleVelocity = 0.0;
-            needleAcceleration = 0.0;
-            needleLastMoved = -1;
-        }
-        else
-        {
-            needleLastMoved =  [[NSDate date] timeIntervalSince1970];
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^(void)
-        {
-            [self setNeedsDisplay];
-        });
-    }
-    else
-    {
-        needleLastMoved =  [[NSDate date] timeIntervalSince1970];
-        [self computeCurrentValue];
-    }
 }
 
 - (UIColor*)rangeColorForValue:(float)value
@@ -554,29 +545,58 @@
     [self setNeedsDisplay];
 }
 
-#pragma mark - Properties
-
-- (void)setValue:(float)value
+- (void)invalidateNeedle
 {
-    if (value > _maxValue)
-        _value = _maxValue;
-    else if (value < _minValue)
-        _value = _minValue;
-    else
-        _value = value;
-    
-    needleVelocity = 0.0;
-    needleAcceleration = 0.0;
-    needleLastMoved = -1;
+    [rootNeedleLayer removeAllAnimations];
+    rootNeedleLayer.sublayers = nil;
+    rootNeedleLayer = nil;
     
     [self setNeedsDisplay];
 }
 
+- (void)updateValue:(float)value
+{
+    if (value > _maxValue)
+        value = _maxValue;
+    else if (value < _minValue)
+        value = _minValue;
+    else
+        value = value;
+    
+    _value = value;
+}
+
+#pragma mark - Properties
+
+- (void)setValue:(float)value
+{
+    [self setValue:value animated:YES];
+}
+
 - (void)setValue:(float)value animated:(BOOL)animated
 {
-    self.value = value;
-    if (!animated)
-        currentValue = _value;
+    [self setValue:value animated:animated widthDuration:0.8];
+}
+
+- (void)setValue:(float)value animated:(BOOL)animated widthDuration:(NSTimeInterval)duration
+{
+    double lastValue = _value;
+    
+    [self updateValue:value];
+    double middleValue = lastValue + (((lastValue + (_value - lastValue) / 2.0) >= 0) ? (_value - lastValue) / 2.0 : (lastValue - _value) / 2.0);
+
+    CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animation.removedOnCompletion = YES;
+    animation.duration = duration;
+    animation.values = [NSArray arrayWithObjects:
+                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
+                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
+                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)],
+                                  nil];
+    
+    rootNeedleLayer.transform = [[animation.values lastObject] CATransform3DValue];
+    [rootNeedleLayer addAnimation:animation forKey:kCATransition];
 }
 
 - (void)setShowInnerBackground:(bool)showInnerBackground
@@ -612,31 +632,31 @@
 - (void)setNeedleWidth:(CGFloat)needleWidth
 {
     _needleWidth = needleWidth;
-    [self setNeedsDisplay];
+    [self invalidateNeedle];
 }
 
 - (void)setNeedleHeight:(CGFloat)needleHeight
 {
     _needleHeight = needleHeight;
-    [self setNeedsDisplay];
+    [self invalidateNeedle];
 }
 
 - (void)setNeedleScrewRadius:(CGFloat)needleScrewRadius
 {
     _needleScrewRadius = needleScrewRadius;
-    [self setNeedsDisplay];
+    [self invalidateNeedle];
 }
 
 - (void)setNeedleStyle:(WMGaugeViewNeedleStyle)needleStyle
 {
     _needleStyle = needleStyle;
-    [self setNeedsDisplay];
+    [self invalidateNeedle];
 }
 
 - (void)setNeedleScrewStyle:(WMGaugeViewNeedleScrewStyle)needleScrewStyle
 {
     _needleScrewStyle = needleScrewStyle;
-    [self setNeedsDisplay];
+    [self invalidateNeedle];
 }
 
 - (void)setScalePosition:(CGFloat)scalePosition

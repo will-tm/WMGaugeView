@@ -86,5 +86,6 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic) bool showUnitOfMeasurement;
 
 - (void)setValue:(float)value animated:(BOOL)animated;
+- (void)setValue:(float)value animated:(BOOL)animated widthDuration:(NSTimeInterval)duration;
 
 @end

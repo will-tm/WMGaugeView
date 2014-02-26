@@ -90,6 +90,7 @@
     
     _showRangeLabels = NO;
     _rangeLabelsWidth = 0.05;
+    _rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.05];
     _rangeLabelsFontKerning = 1.0;
     _rangeValues = nil;
     _rangeColors = nil;
@@ -100,6 +101,7 @@
     
     _scaleFont = nil;
     
+    _unitOfMeasurementFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
     
@@ -235,7 +237,7 @@
 - (void)drawText:(CGContextRef)context
 {
     CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 2.0);
-    UIFont* font = [UIFont fontWithName:@"Helvetica" size:0.04];
+    UIFont* font = _unitOfMeasurementFont?_unitOfMeasurementFont:[UIFont fontWithName:@"Helvetica" size:0.04];
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
     NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:_unitOfMeasurement attributes:stringAttrs];
     CGSize fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
@@ -304,7 +306,7 @@
 {
     CGContextSaveGState(context);
     
-    UIFont* font = _scaleFont?_scaleFont:[UIFont fontWithName:@"Helvetica" size:0.05];
+    UIFont* font = _rangeLabelsFont?_rangeLabelsFont:[UIFont fontWithName:@"Helvetica" size:0.05];
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
     CGSize textSize = [text sizeWithAttributes:stringAttrs];
  
@@ -773,6 +775,18 @@
 - (void)setRangeLabelsFontKerning:(CGFloat)rangeLabelsFontKerning
 {
     _rangeLabelsFontKerning = rangeLabelsFontKerning;
+    [self invalidateBackground];
+}
+
+- (void)setUnitOfMeasurementFont:(UIFont *)unitOfMeasurementFont
+{
+    _unitOfMeasurementFont = unitOfMeasurementFont;
+    [self invalidateBackground];
+}
+
+- (void)setRangeLabelsFont:(UIFont *)rangeLabelsFont
+{
+    _rangeLabelsFont = rangeLabelsFont;
     [self invalidateBackground];
 }
 

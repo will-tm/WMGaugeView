@@ -101,6 +101,7 @@
     
     _scaleFont = nil;
     
+    _unitOfMeasurementVerticalOffset = 0.6;
     _unitOfMeasurementFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
@@ -241,12 +242,11 @@
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
     NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:_unitOfMeasurement attributes:stringAttrs];
     CGSize fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
-    [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, 0.6)];
+    [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, _unitOfMeasurementVerticalOffset)];
 }
 
 - (void)drawScale:(CGContextRef)context
 {
-    
     CGContextSaveGState(context);
     [self rotateContext:context fromCenter:center withAngle:DEGREES_TO_RADIANS(180 + _scaleStartAngle)];
     
@@ -787,6 +787,12 @@
 - (void)setRangeLabelsFont:(UIFont *)rangeLabelsFont
 {
     _rangeLabelsFont = rangeLabelsFont;
+    [self invalidateBackground];
+}
+
+- (void)setUnitOfMeasurementVerticalOffset:(CGFloat)unitOfMeasurementVerticalOffset
+{
+    _unitOfMeasurementVerticalOffset = unitOfMeasurementVerticalOffset;
     [self invalidateBackground];
 }
 

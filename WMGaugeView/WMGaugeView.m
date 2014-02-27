@@ -941,7 +941,7 @@
     [self invalidateBackground];
 }
 
-- (void)setUnitOfMeasurementColor:(CGFloat)unitOfMeasurementColor
+- (void)setUnitOfMeasurementColor:(UIColor *)unitOfMeasurementColor
 {
     _unitOfMeasurementColor = unitOfMeasurementColor;
     [self invalidateBackground];

@@ -47,54 +47,46 @@ WMGaugeViewInnerBackgroundStyle;
 /**
  * WMGaugeView properties
  */
-@property (nonatomic) bool showInnerBackground;
-@property (nonatomic) bool showInnerRim;
-@property (nonatomic) CGFloat innerRimWidth;
-@property (nonatomic) CGFloat innerRimBorderWidth;
-@property (nonatomic) WMGaugeViewInnerBackgroundStyle innerBackgroundStyle;
-
-@property (nonatomic) CGFloat needleWidth;
-@property (nonatomic) CGFloat needleHeight;
-@property (nonatomic) CGFloat needleScrewRadius;
-@property (nonatomic) WMGaugeViewNeedleStyle needleStyle;
-@property (nonatomic) WMGaugeViewNeedleScrewStyle needleScrewStyle;
-
-@property (nonatomic) CGFloat scalePosition;
-@property (nonatomic) CGFloat scaleStartAngle;
-@property (nonatomic) CGFloat scaleEndAngle;
-@property (nonatomic) CGFloat scaleDivisions;
-@property (nonatomic) CGFloat scaleSubdivisions;
-@property (nonatomic) bool showScaleShadow;
-@property (nonatomic) WMGaugeViewSubdivisionsAlignment scalesubdivisionsaligment;
-@property (nonatomic) CGFloat scaleDivisionsLength;
-@property (nonatomic) CGFloat scaleDivisionsWidth;
-@property (nonatomic) CGFloat scaleSubdivisionsLength;
-@property (nonatomic) CGFloat scaleSubdivisionsWidth;
-
-@property (nonatomic, strong) UIColor *scaleDivisionColor;
-@property (nonatomic, strong) UIColor *scaleSubDivisionColor;
-
-@property (nonatomic, strong) UIFont *scaleFont;
-
-
-@property (nonatomic) float value;
-@property (nonatomic) float minValue;
-@property (nonatomic) float maxValue;
-
-@property (nonatomic) bool showRangeLabels;
-@property (nonatomic) CGFloat rangeLabelsWidth;
-@property (nonatomic, strong) UIFont *rangeLabelsFont;
-@property (nonatomic, strong) UIColor *rangeLabelsFontColor;
-@property (nonatomic) CGFloat rangeLabelsFontKerning;
-@property (nonatomic, strong) NSArray *rangeValues;
-@property (nonatomic, strong) NSArray *rangeColors;
-@property (nonatomic, strong) NSArray *rangeLabels;
-
-@property (nonatomic, strong) UIColor *unitOfMeasurementColor;
-@property (nonatomic) CGFloat unitOfMeasurementVerticalOffset;
-@property (nonatomic, strong) UIFont *unitOfMeasurementFont;
-@property (nonatomic, strong) NSString *unitOfMeasurement;
-@property (nonatomic) bool showUnitOfMeasurement;
+@property (nonatomic, readwrite, assign) bool showInnerBackground;
+@property (nonatomic, readwrite, assign) bool showInnerRim;
+@property (nonatomic, readwrite, assign) CGFloat innerRimWidth;
+@property (nonatomic, readwrite, assign) CGFloat innerRimBorderWidth;
+@property (nonatomic, readwrite, assign) WMGaugeViewInnerBackgroundStyle innerBackgroundStyle;
+@property (nonatomic, readwrite, assign) CGFloat needleWidth;
+@property (nonatomic, readwrite, assign) CGFloat needleHeight;
+@property (nonatomic, readwrite, assign) CGFloat needleScrewRadius;
+@property (nonatomic, readwrite, assign) WMGaugeViewNeedleStyle needleStyle;
+@property (nonatomic, readwrite, assign) WMGaugeViewNeedleScrewStyle needleScrewStyle;
+@property (nonatomic, readwrite, assign) CGFloat scalePosition;
+@property (nonatomic, readwrite, assign) CGFloat scaleStartAngle;
+@property (nonatomic, readwrite, assign) CGFloat scaleEndAngle;
+@property (nonatomic, readwrite, assign) CGFloat scaleDivisions;
+@property (nonatomic, readwrite, assign) CGFloat scaleSubdivisions;
+@property (nonatomic, readwrite, assign) bool showScaleShadow;
+@property (nonatomic, readwrite, assign) WMGaugeViewSubdivisionsAlignment scalesubdivisionsaligment;
+@property (nonatomic, readwrite, assign) CGFloat scaleDivisionsLength;
+@property (nonatomic, readwrite, assign) CGFloat scaleDivisionsWidth;
+@property (nonatomic, readwrite, assign) CGFloat scaleSubdivisionsLength;
+@property (nonatomic, readwrite, assign) CGFloat scaleSubdivisionsWidth;
+@property (nonatomic, readwrite, strong) UIColor *scaleDivisionColor;
+@property (nonatomic, readwrite, strong) UIColor *scaleSubDivisionColor;
+@property (nonatomic, readwrite, strong) UIFont *scaleFont;
+@property (nonatomic, readwrite, assign) float value;
+@property (nonatomic, readwrite, assign) float minValue;
+@property (nonatomic, readwrite, assign) float maxValue;
+@property (nonatomic, readwrite, assign) bool showRangeLabels;
+@property (nonatomic, readwrite, assign) CGFloat rangeLabelsWidth;
+@property (nonatomic, readwrite, strong) UIFont *rangeLabelsFont;
+@property (nonatomic, readwrite, strong) UIColor *rangeLabelsFontColor;
+@property (nonatomic, readwrite, assign) CGFloat rangeLabelsFontKerning;
+@property (nonatomic, readwrite, strong) NSArray *rangeValues;
+@property (nonatomic, readwrite, strong) NSArray *rangeColors;
+@property (nonatomic, readwrite, strong) NSArray *rangeLabels;
+@property (nonatomic, readwrite, strong) UIColor *unitOfMeasurementColor;
+@property (nonatomic, readwrite, assign) CGFloat unitOfMeasurementVerticalOffset;
+@property (nonatomic, readwrite, strong) UIFont *unitOfMeasurementFont;
+@property (nonatomic, readwrite, strong) NSString *unitOfMeasurement;
+@property (nonatomic, readwrite, assign) bool showUnitOfMeasurement;
 
 /**
  * WMGaugeView public functions

@@ -726,7 +726,7 @@
     CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     animation.removedOnCompletion = YES;
-    animation.duration = duration;
+    animation.duration = animated ? duration : 0.0;
     animation.delegate = self;
     animation.values = [NSArray arrayWithObjects:
                         [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],

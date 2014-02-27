@@ -7,6 +7,9 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ * Styling enumerations
+ */
 typedef enum
 {
     WMGaugeViewSubdivisionsAlignmentTop,
@@ -36,8 +39,14 @@ typedef enum
 }
 WMGaugeViewInnerBackgroundStyle;
 
+/**
+ * WMGaugeView class
+ */
 @interface WMGaugeView : UIView
 
+/**
+ * WMGaugeView properties
+ */
 @property (nonatomic) bool showInnerBackground;
 @property (nonatomic) bool showInnerRim;
 @property (nonatomic) CGFloat innerRimWidth;
@@ -85,6 +94,9 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic, strong) NSString *unitOfMeasurement;
 @property (nonatomic) bool showUnitOfMeasurement;
 
+/**
+ * WMGaugeView public functions
+ */
 - (void)setValue:(float)value animated:(BOOL)animated;
 - (void)setValue:(float)value animated:(BOOL)animated widthDuration:(NSTimeInterval)duration;
 

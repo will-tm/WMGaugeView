@@ -137,8 +137,8 @@
     center = CGPointMake(0.5, 0.5);
     fullRect = CGRectMake(0.0, 0.0, 1.0, 1.0);
     
-    _innerRimBorderWidth = _showInnerRim?_innerRimBorderWidth:0.0;
-    _innerRimWidth = _showInnerRim?_innerRimWidth:0.0;
+    _innerRimBorderWidth = _showInnerRim ? _innerRimBorderWidth : 0.0;
+    _innerRimWidth = _showInnerRim ? _innerRimWidth : 0.0;
     
     innerRimRect = fullRect;
     innerRimBorderRect = CGRectMake(innerRimRect.origin.x + _innerRimBorderWidth,
@@ -294,8 +294,8 @@
 - (void)drawText:(CGContextRef)context
 {
     CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 2.0);
-    UIFont* font = _unitOfMeasurementFont?_unitOfMeasurementFont:[UIFont fontWithName:@"Helvetica" size:0.04];
-    UIColor* color = _unitOfMeasurementColor? _unitOfMeasurementColor:[UIColor whiteColor];
+    UIFont* font = _unitOfMeasurementFont ? _unitOfMeasurementFont : [UIFont fontWithName:@"Helvetica" size:0.04];
+    UIColor* color = _unitOfMeasurementColor ? _unitOfMeasurementColor : [UIColor whiteColor];
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:_unitOfMeasurement attributes:stringAttrs];
     CGSize fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
@@ -329,10 +329,10 @@
         if ((abs(mod - 0) < 0.000001) || (abs(mod - div) < 0.000001))
         {
             // Initialize Core Graphics settings
-            UIColor *color = (_rangeValues && _rangeColors)?[self rangeColorForValue:value]:_scaleDivisionColor;
+            UIColor *color = (_rangeValues && _rangeColors) ? [self rangeColorForValue:value] : _scaleDivisionColor;
             CGContextSetStrokeColorWithColor(context, color.CGColor);
             CGContextSetLineWidth(context, _scaleDivisionsWidth);
-            CGContextSetShadow(context, CGSizeMake(0.05, 0.05), _showScaleShadow?2.0:0.0);
+            CGContextSetShadow(context, CGSizeMake(0.05, 0.05), _showScaleShadow ? 2.0 : 0.0);
             
             // Draw tick
             CGContextMoveToPoint(context, 0.5, y1);
@@ -341,7 +341,7 @@
             
             // Draw label
             NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
-            UIFont* font = _scaleFont?_scaleFont:[UIFont fontWithName:@"Helvetica-Bold" size:0.05];
+            UIFont* font = _scaleFont ? _scaleFont : [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
             NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
             NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
             CGSize fontWidth = [valueString sizeWithAttributes:stringAttrs];
@@ -351,7 +351,7 @@
         else
         {
             // Initialize Core Graphics settings
-            UIColor *color = (_rangeValues && _rangeColors)?[self rangeColorForValue:value]:_scaleSubDivisionColor;
+            UIColor *color = (_rangeValues && _rangeColors) ? [self rangeColorForValue:value] : _scaleSubDivisionColor;
             CGContextSetStrokeColorWithColor(context, color.CGColor);
             CGContextSetLineWidth(context, _scaleSubdivisionsWidth);
             CGContextMoveToPoint(context, 0.5, y1);
@@ -594,8 +594,8 @@
 {
     CGContextSaveGState(context);
     
-    UIFont* font = _rangeLabelsFont?_rangeLabelsFont:[UIFont fontWithName:@"Helvetica" size:0.05];
-    UIColor* color = _rangeLabelsFontColor?_rangeLabelsFontColor:[UIColor whiteColor];
+    UIFont* font = _rangeLabelsFont ? _rangeLabelsFont : [UIFont fontWithName:@"Helvetica" size:0.05];
+    UIColor* color = _rangeLabelsFontColor ? _rangeLabelsFontColor : [UIColor whiteColor];
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     CGSize textSize = [text sizeWithAttributes:stringAttrs];
  
@@ -617,7 +617,7 @@
         float totalWidth = [[NSString stringWithFormat:@"%@%@", lastLetter, letter] sizeWithAttributes:stringAttrs].width;
         float currentLetterWidth = [letter sizeWithAttributes:stringAttrs].width;
         float lastLetterWidth = [lastLetter sizeWithAttributes:stringAttrs].width;
-        float kerning = (lastLetterWidth) ? 0 : ((currentLetterWidth + lastLetterWidth) - totalWidth);
+        float kerning = (lastLetterWidth) ? 0.0 : ((currentLetterWidth + lastLetterWidth) - totalWidth);
         
         letterPosition += (charSize.width / 2) - kerning;
         float angle = (letterPosition / perimeter * 2 * M_PI) * _rangeLabelsFontKerning;

@@ -61,7 +61,9 @@
 -(void)gaugeUpdateTimer:(NSTimer *)timer
 {
     _gaugeView.value = rand()%(int)_gaugeView.maxValue;
-    _gaugeView2.value = rand()%(int)_gaugeView2.maxValue;
+    [_gaugeView2 setValue:rand()%(int)_gaugeView2.maxValue animated:YES duration:1.6 completion:^(BOOL finished) {
+        NSLog(@"gaugeView2 animation complete");
+    }];
 }
 
 @end

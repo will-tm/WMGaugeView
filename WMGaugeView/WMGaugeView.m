@@ -45,6 +45,9 @@
     
     /* Needle layer */
     CALayer *rootNeedleLayer;
+
+    /* Annimation completion */
+    void (^animationCompletion)(BOOL);
 }
 
 #pragma mark - Initialization
@@ -119,6 +122,8 @@
     _unitOfMeasurementFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
+    
+    animationCompletion = nil;
 
     [self initDrawingRects];
     [self initScale];
@@ -684,34 +689,63 @@
  */
 - (void)setValue:(float)value animated:(BOOL)animated
 {
-    [self setValue:value animated:animated widthDuration:0.8];
+    [self setValue:value animated:animated duration:0.8];
+}
+
+/**
+ * Update gauge value with animation and fire a completion block
+ */
+- (void)setValue:(float)value animated:(BOOL)animated completion:(void (^)(BOOL finished))completion
+{
+    [self setValue:value animated:animated duration:0.8 completion:completion];
 }
 
 /**
  * Update gauge value with animation and duration
  */
-- (void)setValue:(float)value animated:(BOOL)animated widthDuration:(NSTimeInterval)duration
+- (void)setValue:(float)value animated:(BOOL)animated duration:(NSTimeInterval)duration
 {
+    [self setValue:value animated:animated duration:duration completion:nil];
+}
+
+/**
+ * Update gauge value with animation, duration and fire a completion block
+ */
+- (void)setValue:(float)value animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)(BOOL finished))completion
+{
+    animationCompletion = completion;
+    
     double lastValue = _value;
     
     [self updateValue:value];
     double middleValue = lastValue + (((lastValue + (_value - lastValue) / 2.0) >= 0) ? (_value - lastValue) / 2.0 : (lastValue - _value) / 2.0);
-
+    
     // Needle animation to target value
     // An intermediate "middle" value is used to make sure the needle will follow the right rotation direction
-
+    
     CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform"];
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     animation.removedOnCompletion = YES;
     animation.duration = duration;
+    animation.delegate = self;
     animation.values = [NSArray arrayWithObjects:
-                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
-                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
-                                  [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)],
-                                  nil];
+                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
+                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)],
+                        nil];
     
     rootNeedleLayer.transform = [[animation.values lastObject] CATransform3DValue];
     [rootNeedleLayer addAnimation:animation forKey:kCATransition];
+}
+
+#pragma mark - CAAnimation delegate
+
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    if (animationCompletion)
+        animationCompletion(flag);
+    
+    animationCompletion = nil;
 }
 
 #pragma mark - Properties

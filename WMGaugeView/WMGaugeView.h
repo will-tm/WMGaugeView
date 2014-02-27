@@ -100,6 +100,8 @@ WMGaugeViewInnerBackgroundStyle;
  * WMGaugeView public functions
  */
 - (void)setValue:(float)value animated:(BOOL)animated;
-- (void)setValue:(float)value animated:(BOOL)animated widthDuration:(NSTimeInterval)duration;
+- (void)setValue:(float)value animated:(BOOL)animated completion:(void (^)(BOOL finished))completion;
+- (void)setValue:(float)value animated:(BOOL)animated duration:(NSTimeInterval)duration;
+- (void)setValue:(float)value animated:(BOOL)animated duration:(NSTimeInterval)duration completion:(void (^)(BOOL finished))completion;
 
 @end

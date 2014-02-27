@@ -103,6 +103,7 @@
     _showRangeLabels = NO;
     _rangeLabelsWidth = 0.05;
     _rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.05];
+    _rangeLabelsFontColor = [UIColor whiteColor];
     _rangeLabelsFontKerning = 1.0;
     _rangeValues = nil;
     _rangeColors = nil;
@@ -589,7 +590,8 @@
     CGContextSaveGState(context);
     
     UIFont* font = _rangeLabelsFont?_rangeLabelsFont:[UIFont fontWithName:@"Helvetica" size:0.05];
-    NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
+    UIColor* color = _rangeLabelsFontColor?_rangeLabelsFontColor:[UIColor whiteColor];
+    NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     CGSize textSize = [text sizeWithAttributes:stringAttrs];
  
     float perimeter = 2 * M_PI * radius;
@@ -944,6 +946,12 @@
 - (void)setUnitOfMeasurementColor:(UIColor *)unitOfMeasurementColor
 {
     _unitOfMeasurementColor = unitOfMeasurementColor;
+    [self invalidateBackground];
+}
+
+- (void)setRangeLabelsFontColor:(UIColor *)rangeLabelsFontColor
+{
+    _rangeLabelsFontColor = rangeLabelsFontColor;
     [self invalidateBackground];
 }
 

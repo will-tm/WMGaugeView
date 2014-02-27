@@ -76,14 +76,15 @@ WMGaugeViewInnerBackgroundStyle;
 
 @property (nonatomic, strong) UIFont *scaleFont;
 
-@property (nonatomic) CGFloat rangeLabelsWidth;
 
 @property (nonatomic) float value;
 @property (nonatomic) float minValue;
 @property (nonatomic) float maxValue;
 
 @property (nonatomic) bool showRangeLabels;
+@property (nonatomic) CGFloat rangeLabelsWidth;
 @property (nonatomic, strong) UIFont *rangeLabelsFont;
+@property (nonatomic, strong) UIColor *rangeLabelsFontColor;
 @property (nonatomic) CGFloat rangeLabelsFontKerning;
 @property (nonatomic, strong) NSArray *rangeValues;
 @property (nonatomic, strong) NSArray *rangeColors;

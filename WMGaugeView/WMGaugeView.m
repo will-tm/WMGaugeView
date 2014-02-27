@@ -102,6 +102,7 @@
     _scaleFont = nil;
     
     _unitOfMeasurementVerticalOffset = 0.6;
+    _unitOfMeasurementColor = [UIColor whiteColor];
     _unitOfMeasurementFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
@@ -239,7 +240,8 @@
 {
     CGContextSetShadow(context, CGSizeMake(0.05, 0.05), 2.0);
     UIFont* font = _unitOfMeasurementFont?_unitOfMeasurementFont:[UIFont fontWithName:@"Helvetica" size:0.04];
-    NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : [UIColor whiteColor] };
+    UIColor* color = _unitOfMeasurementColor? _unitOfMeasurementColor:[UIColor whiteColor];
+    NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:_unitOfMeasurement attributes:stringAttrs];
     CGSize fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
     [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, _unitOfMeasurementVerticalOffset)];
@@ -798,6 +800,12 @@
 - (void)setUnitOfMeasurementVerticalOffset:(CGFloat)unitOfMeasurementVerticalOffset
 {
     _unitOfMeasurementVerticalOffset = unitOfMeasurementVerticalOffset;
+    [self invalidateBackground];
+}
+
+- (void)setUnitOfMeasurementColor:(CGFloat)unitOfMeasurementColor
+{
+    _unitOfMeasurementColor = unitOfMeasurementColor;
     [self invalidateBackground];
 }
 

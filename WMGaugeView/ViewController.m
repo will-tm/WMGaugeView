@@ -31,6 +31,11 @@
     _gaugeView.rangeLabels = @[ @"VERY LOW",          @"LOW",             @"OK",              @"OVER FILL"        ];
     _gaugeView.unitOfMeasurement = @"psi";
     _gaugeView.showUnitOfMeasurement = YES;
+    _gaugeView.scaleDivisionsWidth = 0.008;
+    _gaugeView.scaleSubdivisionsWidth = 0.006;
+    _gaugeView.rangeLabelsFontColor = [UIColor blackColor];
+    _gaugeView.rangeLabelsWidth = 0.04;
+    _gaugeView.rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     
     _gaugeView2.maxValue = 100.0;
     _gaugeView2.scaleDivisions = 10;
@@ -40,7 +45,7 @@
     _gaugeView2.innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleFlat;
     _gaugeView2.showScaleShadow = NO;
     _gaugeView2.scaleFont = [UIFont fontWithName:@"AvenirNext-UltraLight" size:0.065];
-    _gaugeView2.scalesubdivisionsaligment = WMGaugeViewSubdivisionsAlignmentCenter;
+    _gaugeView2.scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentCenter;
     _gaugeView2.scaleSubdivisionsWidth = 0.002;
     _gaugeView2.scaleSubdivisionsLength = 0.04;
     _gaugeView2.scaleDivisionsWidth = 0.007;

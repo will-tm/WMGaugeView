@@ -91,7 +91,7 @@
     _scaleDivisions = 12.0;
     _scaleSubdivisions = 10.0;
     _showScaleShadow = YES;
-    _scalesubdivisionsaligment = WMGaugeViewSubdivisionsAlignmentTop;
+    _scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentTop;
     _scaleDivisionsLength = 0.045;
     _scaleDivisionsWidth = 0.01;
     _scaleSubdivisionsLength = 0.015;
@@ -314,8 +314,8 @@
     for (int i = 0; i < totalTicks; i++)
     {
         CGFloat offset = 0.0;
-        if (_scalesubdivisionsaligment == WMGaugeViewSubdivisionsAlignmentCenter) offset = (_scaleDivisionsLength - _scaleSubdivisionsLength) / 2.0;
-        if (_scalesubdivisionsaligment == WMGaugeViewSubdivisionsAlignmentBottom) offset = _scaleDivisionsLength - _scaleSubdivisionsLength;
+        if (_scalesubdivisionsAligment == WMGaugeViewSubdivisionsAlignmentCenter) offset = (_scaleDivisionsLength - _scaleSubdivisionsLength) / 2.0;
+        if (_scalesubdivisionsAligment == WMGaugeViewSubdivisionsAlignmentBottom) offset = _scaleDivisionsLength - _scaleSubdivisionsLength;
         
         CGFloat y1 = scaleRect.origin.y;
         CGFloat y2 = y1 + _scaleSubdivisionsLength;
@@ -851,9 +851,9 @@
     [self invalidateBackground];
 }
 
-- (void)setScalesubdivisionsaligment:(WMGaugeViewSubdivisionsAlignment)scalesubdivisionsaligment
+- (void)setScalesubdivisionsAligment:(WMGaugeViewSubdivisionsAlignment)scalesubdivisionsAligment
 {
-    _scalesubdivisionsaligment = scalesubdivisionsaligment;
+    _scalesubdivisionsAligment = scalesubdivisionsAligment;
     [self invalidateBackground];
 }
 

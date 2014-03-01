@@ -63,7 +63,7 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic, readwrite, assign) CGFloat scaleDivisions;
 @property (nonatomic, readwrite, assign) CGFloat scaleSubdivisions;
 @property (nonatomic, readwrite, assign) bool showScaleShadow;
-@property (nonatomic, readwrite, assign) WMGaugeViewSubdivisionsAlignment scalesubdivisionsaligment;
+@property (nonatomic, readwrite, assign) WMGaugeViewSubdivisionsAlignment scalesubdivisionsAligment;
 @property (nonatomic, readwrite, assign) CGFloat scaleDivisionsLength;
 @property (nonatomic, readwrite, assign) CGFloat scaleDivisionsWidth;
 @property (nonatomic, readwrite, assign) CGFloat scaleSubdivisionsLength;

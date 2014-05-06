@@ -7,7 +7,7 @@ WMGaugeView is a simple gauge like view that provide customizable visualizations
 ## Requirements
 * Xcode 5 or higher
 * Apple LLVM compiler
-* iOS 6.0 or higher
+* iOS 7.0 or higher
 * ARC
 
 ## Installation

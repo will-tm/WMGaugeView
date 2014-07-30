@@ -217,7 +217,8 @@
     if (_showUnitOfMeasurement)
         [self drawText:context];
 
-    [self drawScale:context];
+    if (_showScale)
+        [self drawScale:context];
 
     if (_showRangeLabels)
         [self drawRangeLabels:context];
@@ -876,6 +877,12 @@
 - (void)setShowScaleShadow:(bool)showScaleShadow
 {
     _showScaleShadow = showScaleShadow;
+    [self invalidateBackground];
+}
+
+- (void)setShowScale:(bool)showScale
+{
+    _showScale = showScale;
     [self invalidateBackground];
 }
 

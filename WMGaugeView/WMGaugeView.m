@@ -77,7 +77,7 @@
     _showInnerBackground = YES;
     _innerRimWidth = 0.05;
     _innerRimBorderWidth = 0.005;
-    _innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleFlat;
+    _innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleGradient;
     
     _needleWidth = 0.035;
     _needleHeight = 0.34;
@@ -480,7 +480,7 @@
             needleLayer.fillColor = CGRGB(255, 104, 97);
             needleLayer.strokeColor = CGRGB(255, 104, 97);
             needleLayer.lineWidth = 1.2;
-            
+
             // Needle shadow
             needleLayer.shadowColor = [[UIColor blackColor] CGColor];
             needleLayer.shadowOffset = CGSizeMake(-2.0, -2.0);

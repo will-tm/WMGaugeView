@@ -123,6 +123,9 @@
     _unitOfMeasurement = @"";
     _showUnitOfMeasurement = NO;
     
+    _innerExternalCircleColor = [UIColor grayColor];// RGB(255, 104, 97);
+    _innerInnerCircleColor = RGB(242, 99, 92);
+    
     animationCompletion = nil;
 
     [self initDrawingRects];
@@ -274,12 +277,12 @@
             
             // External circle
             CGContextAddEllipseInRect(context, CGRectMake(center.x - EXTERNAL_RING_RADIUS, center.y - EXTERNAL_RING_RADIUS, EXTERNAL_RING_RADIUS * 2.0, EXTERNAL_RING_RADIUS * 2.0));
-            CGContextSetFillColorWithColor(context, CGRGB(255, 104, 97));
+            CGContextSetFillColorWithColor(context, _innerExternalCircleColor.CGColor);
             CGContextFillPath(context);
             
             // Inner circle
             CGContextAddEllipseInRect(context, CGRectMake(center.x - INTERNAL_RING_RADIUS, center.y - INTERNAL_RING_RADIUS, INTERNAL_RING_RADIUS * 2.0, INTERNAL_RING_RADIUS * 2.0));
-            CGContextSetFillColorWithColor(context, CGRGB(242, 99, 92));
+            CGContextSetFillColorWithColor(context, _innerInnerCircleColor.CGColor);
             CGContextFillPath(context);
         }
         break;
@@ -477,7 +480,7 @@
             needleLayer.fillColor = CGRGB(255, 104, 97);
             needleLayer.strokeColor = CGRGB(255, 104, 97);
             needleLayer.lineWidth = 1.2;
-            
+
             // Needle shadow
             needleLayer.shadowColor = [[UIColor blackColor] CGColor];
             needleLayer.shadowOffset = CGSizeMake(-2.0, -2.0);
@@ -1021,6 +1024,12 @@
 - (void)setRangeLabelsFontColor:(UIColor *)rangeLabelsFontColor
 {
     _rangeLabelsFontColor = rangeLabelsFontColor;
+    [self invalidateBackground];
+}
+
+- (void)setInnerExternalCircleColor:(UIColor *)innerExternalCircleColor
+{
+    _innerExternalCircleColor = innerExternalCircleColor;
     [self invalidateBackground];
 }
 

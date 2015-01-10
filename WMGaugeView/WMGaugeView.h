@@ -88,6 +88,8 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic, readwrite, strong) UIFont *unitOfMeasurementFont;
 @property (nonatomic, readwrite, strong) NSString *unitOfMeasurement;
 @property (nonatomic, readwrite, assign) bool showUnitOfMeasurement;
+@property (nonatomic, readwrite, strong) UIColor *innerExternalCircleColor;
+@property (nonatomic, readwrite, strong) UIColor *innerInnerCircleColor;
 
 /**
  * WMGaugeView public functions

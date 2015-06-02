@@ -44,6 +44,7 @@
     _gaugeView2.scaleEndAngle = 280;
     _gaugeView2.innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleFlat;
     _gaugeView2.showScaleShadow = NO;
+    _gaugeView2.showScale = YES;
     _gaugeView2.scaleFont = [UIFont fontWithName:@"AvenirNext-UltraLight" size:0.065];
     _gaugeView2.scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentCenter;
     _gaugeView2.scaleSubdivisionsWidth = 0.002;

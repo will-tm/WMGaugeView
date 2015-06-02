@@ -45,7 +45,9 @@
     
     /* Needle layer */
     CALayer *rootNeedleLayer;
-
+    /* For thin style */
+    CAShapeLayer *needleLayer;
+    
     /* Annimation completion */
     void (^animationCompletion)(BOOL);
 }
@@ -465,7 +467,7 @@
             
         case WMGaugeViewNeedleStyleFlatThin:
         {
-            CAShapeLayer *needleLayer = [CAShapeLayer layer];
+            needleLayer = [CAShapeLayer layer];
             UIBezierPath *needlePath = [UIBezierPath bezierPath];
             [needlePath moveToPoint:CGPointMake(FULL_SCALE(center.x - _needleWidth, center.y))];
             [needlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x + _needleWidth, center.y))];
@@ -763,8 +765,27 @@
                         [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)],
                         nil];
     
+    rootNeedleLayer.transform = [[animation.values objectAtIndex:0] CATransform3DValue];
+    CGAffineTransform affineTransform1 = [rootNeedleLayer affineTransform];
+    rootNeedleLayer.transform = [[animation.values objectAtIndex:1] CATransform3DValue];
+    CGAffineTransform affineTransform2 = [rootNeedleLayer affineTransform];
     rootNeedleLayer.transform = [[animation.values lastObject] CATransform3DValue];
+    CGAffineTransform affineTransform3 = [rootNeedleLayer affineTransform];
+    
+    needleLayer.shadowOffset = CGSizeApplyAffineTransform(CGSizeMake(-2.0, -2.0), affineTransform3);
+    
     [rootNeedleLayer addAnimation:animation forKey:kCATransition];
+    
+    CAKeyframeAnimation * animationShadowOffset = [CAKeyframeAnimation animationWithKeyPath:@"shadowOffset"];
+    animationShadowOffset.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animationShadowOffset.removedOnCompletion = YES;
+    animationShadowOffset.duration = animated ? duration : 0.0;
+    animationShadowOffset.values = [NSArray arrayWithObjects:
+                                    [NSValue valueWithCGSize:CGSizeApplyAffineTransform(CGSizeMake(-2.0, -2.0), affineTransform1)],
+                                    [NSValue valueWithCGSize:CGSizeApplyAffineTransform(CGSizeMake(-2.0, -2.0), affineTransform2)],
+                                    [NSValue valueWithCGSize:CGSizeApplyAffineTransform(CGSizeMake(-2.0, -2.0), affineTransform3)],
+                                    nil];
+    [needleLayer addAnimation:animationShadowOffset forKey:kCATransition];
 }
 
 #pragma mark - CAAnimation delegate

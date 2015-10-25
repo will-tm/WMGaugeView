@@ -35,8 +35,8 @@ $ edit Podfile
 Edit your Podfile and add WMGaugeView:
 
 ``` bash
-platform :ios, '6.0'
-pod 'WMGaugeView', '~> 0.0.3'
+platform :ios, '8.0'
+pod 'WMGaugeView'
 ```
 
 Install into your Xcode project:
@@ -60,12 +60,12 @@ All you need to do is drop `WMGaugeView` files into your project, and add `#incl
 ## Example Usage
 
 ``` objective-c
+gaugeView.style = [WMGaugeViewStyleFlatThin new];
 gaugeView.maxValue = 100.0;
 gaugeView.scaleDivisions = 10;
 gaugeView.scaleSubdivisions = 5;
 gaugeView.scaleStartAngle = 30;
 gaugeView.scaleEndAngle = 280;
-gaugeView.innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleFlat;
 gaugeView.showScaleShadow = NO;
 gaugeView.scaleFont = [UIFont fontWithName:@"AvenirNext-UltraLight" size:0.065];
 gaugeView.scalesubdivisionsaligment = WMGaugeViewSubdivisionsAlignmentCenter;
@@ -73,11 +73,6 @@ gaugeView.scaleSubdivisionsWidth = 0.002;
 gaugeView.scaleSubdivisionsLength = 0.04;
 gaugeView.scaleDivisionsWidth = 0.007;
 gaugeView.scaleDivisionsLength = 0.07;
-gaugeView.needleStyle = WMGaugeViewNeedleStyleFlatThin;
-gaugeView.needleWidth = 0.012;
-gaugeView.needleHeight = 0.4;
-gaugeView.needleScrewStyle = WMGaugeViewNeedleScrewStylePlain;
-gaugeView.needleScrewRadius = 0.05;
 
 [gaugeView setValue:56.2 animated:YES duration:1.6 completion:^(BOOL finished) {
   NSLog(@"gaugeView animation complete");
@@ -93,12 +88,6 @@ You can customize the following properties of `WMGaugeView`:
 @property (nonatomic, readwrite, assign) bool showInnerRim;
 @property (nonatomic, readwrite, assign) CGFloat innerRimWidth;
 @property (nonatomic, readwrite, assign) CGFloat innerRimBorderWidth;
-@property (nonatomic, readwrite, assign) WMGaugeViewInnerBackgroundStyle innerBackgroundStyle;
-@property (nonatomic, readwrite, assign) CGFloat needleWidth;
-@property (nonatomic, readwrite, assign) CGFloat needleHeight;
-@property (nonatomic, readwrite, assign) CGFloat needleScrewRadius;
-@property (nonatomic, readwrite, assign) WMGaugeViewNeedleStyle needleStyle;
-@property (nonatomic, readwrite, assign) WMGaugeViewNeedleScrewStyle needleScrewStyle;
 @property (nonatomic, readwrite, assign) CGFloat scalePosition;
 @property (nonatomic, readwrite, assign) CGFloat scaleStartAngle;
 @property (nonatomic, readwrite, assign) CGFloat scaleEndAngle;
@@ -130,6 +119,8 @@ You can customize the following properties of `WMGaugeView`:
 @property (nonatomic, readwrite, strong) NSString *unitOfMeasurement;
 @property (nonatomic, readwrite, assign) bool showUnitOfMeasurement;
 ```
+
+Drawing is handled by style protocols in order to provide easy customization of background and needle.
 
 ## Authors
 

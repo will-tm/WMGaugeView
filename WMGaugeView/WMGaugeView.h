@@ -6,6 +6,9 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "WMGaugeViewStyle.h"
+#import "WMGaugeViewStyleFlatThin.h"
+#import "WMGaugeViewStyle3D.h"
 
 /**
  * Styling enumerations
@@ -17,27 +20,6 @@ typedef enum
     WMGaugeViewSubdivisionsAlignmentBottom
 }
 WMGaugeViewSubdivisionsAlignment;
-
-typedef enum
-{
-    WMGaugeViewNeedleStyle3D,
-    WMGaugeViewNeedleStyleFlatThin
-}
-WMGaugeViewNeedleStyle;
-
-typedef enum
-{
-    WMGaugeViewNeedleScrewStyleGradient,
-    WMGaugeViewNeedleScrewStylePlain
-}
-WMGaugeViewNeedleScrewStyle;
-
-typedef enum
-{
-    WMGaugeViewInnerBackgroundStyleGradient,
-    WMGaugeViewInnerBackgroundStyleFlat
-}
-WMGaugeViewInnerBackgroundStyle;
 
 /**
  * WMGaugeView class
@@ -51,12 +33,6 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic, readwrite, assign) bool showInnerRim;
 @property (nonatomic, readwrite, assign) CGFloat innerRimWidth;
 @property (nonatomic, readwrite, assign) CGFloat innerRimBorderWidth;
-@property (nonatomic, readwrite, assign) WMGaugeViewInnerBackgroundStyle innerBackgroundStyle;
-@property (nonatomic, readwrite, assign) CGFloat needleWidth;
-@property (nonatomic, readwrite, assign) CGFloat needleHeight;
-@property (nonatomic, readwrite, assign) CGFloat needleScrewRadius;
-@property (nonatomic, readwrite, assign) WMGaugeViewNeedleStyle needleStyle;
-@property (nonatomic, readwrite, assign) WMGaugeViewNeedleScrewStyle needleScrewStyle;
 @property (nonatomic, readwrite, assign) CGFloat scalePosition;
 @property (nonatomic, readwrite, assign) CGFloat scaleStartAngle;
 @property (nonatomic, readwrite, assign) CGFloat scaleEndAngle;
@@ -88,6 +64,7 @@ WMGaugeViewInnerBackgroundStyle;
 @property (nonatomic, readwrite, strong) UIFont *unitOfMeasurementFont;
 @property (nonatomic, readwrite, strong) NSString *unitOfMeasurement;
 @property (nonatomic, readwrite, assign) bool showUnitOfMeasurement;
+@property (nonatomic, readwrite, strong) id<WMGaugeViewStyle> style;
 
 /**
  * WMGaugeView public functions

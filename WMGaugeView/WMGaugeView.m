@@ -7,17 +7,6 @@
 
 #import "WMGaugeView.h"
 
-/* Degrees to radians conversion macro */
-#define DEGREES_TO_RADIANS(degrees) (degrees) / 180.0 * M_PI
-
-/* Colors creation macros */
-#define RGB(r,g,b) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:1.0]
-#define RGBA(r,g,b,a) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0]
-#define CGRGB(r,g,b) RGB(r,g,b).CGColor
-#define iCGRGB(r,g,b) (id)CGRGB(r,g,b)
-#define CGRGBA(r,g,b,a) RGBA(r,g,b,a).CGColor
-#define iCGRGBA(r,g,b,a) (id)CGRGBA(r,g,b,a)
-
 /* Scale conversion macro from [0-1] range to view  real size range */
 #define FULL_SCALE(x,y)    (x)*self.bounds.size.width, (y)*self.bounds.size.height
 
@@ -73,23 +62,18 @@
  */
 - (void)initialize;
 {
+    _style = nil;
     _showInnerRim = NO;
     _showInnerBackground = YES;
     _innerRimWidth = 0.05;
     _innerRimBorderWidth = 0.005;
-    _innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleGradient;
-    
-    _needleWidth = 0.035;
-    _needleHeight = 0.34;
-    _needleScrewRadius = 0.04;
-    _needleStyle = WMGaugeViewNeedleStyle3D;
-    _needleScrewStyle = WMGaugeViewNeedleScrewStyleGradient;
     
     _scalePosition = 0.025;
     _scaleStartAngle = 30.0;
     _scaleEndAngle = 330.0;
     _scaleDivisions = 12.0;
     _scaleSubdivisions = 10.0;
+    _showScale = YES;
     _showScaleShadow = YES;
     _scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentTop;
     _scaleDivisionsLength = 0.045;
@@ -197,7 +181,6 @@
         
         // Draw needle
         [self drawNeedle];
-        [self drawNeedleScrew];
         
         // Set needle current value
         [self setValue:_value animated:NO];
@@ -237,55 +220,8 @@
  */
 - (void)drawFace:(CGContextRef)context
 {
-    switch (_innerBackgroundStyle)
-    {
-        case WMGaugeViewInnerBackgroundStyleGradient:
-        {
-            // Default Face
-            CGColorSpaceRef baseSpace = CGColorSpaceCreateDeviceRGB();
-            CGGradientRef gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGB(96, 96, 96), iCGRGB(68, 68, 68), iCGRGB(32, 32, 32)], (const CGFloat[]){0.35, 0.96, 0.99});
-            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-            CGContextAddEllipseInRect(context, faceRect);
-            CGContextClip(context);
-            CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
-            CGGradientRelease(gradient), gradient = NULL;
-            
-            // Shadow
-            baseSpace = CGColorSpaceCreateDeviceRGB();
-            gradient = CGGradientCreateWithColors(baseSpace, (CFArrayRef)@[iCGRGBA(40, 96, 170, 60), iCGRGBA(15, 34, 98, 80), iCGRGBA(0, 0, 0, 120), iCGRGBA(0, 0, 0, 140)], (const CGFloat[]){0.60, 0.85, 0.96, 0.99});
-            CGColorSpaceRelease(baseSpace), baseSpace = NULL;
-            CGContextAddEllipseInRect(context, faceRect);
-            CGContextClip(context);
-            CGContextDrawRadialGradient(context, gradient, center, 0, center, faceRect.size.width / 2.0, kCGGradientDrawsAfterEndLocation);
-            CGGradientRelease(gradient), gradient = NULL;
-            
-            // Border
-            CGContextSetLineWidth(context, 0.005);
-            CGContextSetStrokeColorWithColor(context, CGRGBA(81, 84, 89, 160));
-            CGContextAddEllipseInRect(context, faceRect);
-            CGContextStrokePath(context);
-        }
-        break;
-        
-        case WMGaugeViewInnerBackgroundStyleFlat:
-        {
-            #define EXTERNAL_RING_RADIUS    0.24
-            #define INTERNAL_RING_RADIUS    0.1
-            
-            // External circle
-            CGContextAddEllipseInRect(context, CGRectMake(center.x - EXTERNAL_RING_RADIUS, center.y - EXTERNAL_RING_RADIUS, EXTERNAL_RING_RADIUS * 2.0, EXTERNAL_RING_RADIUS * 2.0));
-            CGContextSetFillColorWithColor(context, CGRGB(255, 104, 97));
-            CGContextFillPath(context);
-            
-            // Inner circle
-            CGContextAddEllipseInRect(context, CGRectMake(center.x - INTERNAL_RING_RADIUS, center.y - INTERNAL_RING_RADIUS, INTERNAL_RING_RADIUS * 2.0, INTERNAL_RING_RADIUS * 2.0));
-            CGContextSetFillColorWithColor(context, CGRGB(242, 99, 92));
-            CGContextFillPath(context);
-        }
-        break;
-            
-        default:
-        break;
+    if ([_style conformsToProtocol:@protocol(WMGaugeViewStyle)]) {
+        [_style drawFaceWithContext:context inRect:faceRect];
     }
 }
 
@@ -300,11 +236,7 @@
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:_unitOfMeasurement attributes:stringAttrs];
     CGSize fontWidth;
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-        fontWidth = [_unitOfMeasurement sizeWithFont:font];
-    } else {
-        fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
-    }
+    fontWidth = [_unitOfMeasurement sizeWithAttributes:stringAttrs];
 
     [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, _unitOfMeasurementVerticalOffset)];
 }
@@ -333,7 +265,7 @@
         float mod = (int)value % (int)div;
         
         // Division
-        if ((abs(mod - 0) < 0.000001) || (abs(mod - div) < 0.000001))
+        if ((fabsf(mod - 0) < 0.000001) || (fabsf(mod - div) < 0.000001))
         {
             // Initialize Core Graphics settings
             UIColor *color = (_rangeValues && _rangeColors) ? [self rangeColorForValue:value] : _scaleDivisionColor;
@@ -352,11 +284,7 @@
             NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
             NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
             CGSize fontWidth;
-            if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-                fontWidth = [valueString sizeWithFont:font];
-            } else {
-                fontWidth = [valueString sizeWithAttributes:stringAttrs];
-            }
+            fontWidth = [valueString sizeWithAttributes:stringAttrs];
             
             [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, y3 + 0.005)];
         }
@@ -423,125 +351,8 @@
  */
 - (void)drawNeedle
 {
-    switch (_needleStyle)
-    {
-        case WMGaugeViewNeedleStyle3D:
-        {
-            // Left Needle
-            CAShapeLayer *leftNeedleLayer = [CAShapeLayer layer];
-            UIBezierPath *leftNeedlePath = [UIBezierPath bezierPath];
-            [leftNeedlePath moveToPoint:CGPointMake(FULL_SCALE(center.x, center.y))];
-            [leftNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x - _needleWidth, center.y))];
-            [leftNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
-            [leftNeedlePath closePath];
-
-            leftNeedleLayer.path = leftNeedlePath.CGPath;
-            leftNeedleLayer.backgroundColor = [[UIColor clearColor] CGColor];
-            leftNeedleLayer.fillColor = CGRGB(176, 10, 19);
- 
-            [rootNeedleLayer addSublayer:leftNeedleLayer];
-            
-            // Right Needle
-            CAShapeLayer *rightNeedleLayer = [CAShapeLayer layer];
-            UIBezierPath *rightNeedlePath = [UIBezierPath bezierPath];
-            [rightNeedlePath moveToPoint:CGPointMake(FULL_SCALE(center.x, center.y))];
-            [rightNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x + _needleWidth, center.y))];
-            [rightNeedlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
-            [rightNeedlePath closePath];
- 
-            rightNeedleLayer.path = rightNeedlePath.CGPath;
-            rightNeedleLayer.backgroundColor = [[UIColor clearColor] CGColor];
-            rightNeedleLayer.fillColor = CGRGB(252, 18, 30);
-            
-            [rootNeedleLayer addSublayer:rightNeedleLayer];
-            
-            // Needle shadow
-            [rootNeedleLayer setShadowColor:[[UIColor blackColor] CGColor]];
-            [rootNeedleLayer setShadowOffset:CGSizeMake(0, 0)];
-            [rootNeedleLayer setShadowOpacity:0.5];
-            [rootNeedleLayer setShadowRadius:2.0];
-        }
-        break;
-            
-        case WMGaugeViewNeedleStyleFlatThin:
-        {
-            CAShapeLayer *needleLayer = [CAShapeLayer layer];
-            UIBezierPath *needlePath = [UIBezierPath bezierPath];
-            [needlePath moveToPoint:CGPointMake(FULL_SCALE(center.x - _needleWidth, center.y))];
-            [needlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x + _needleWidth, center.y))];
-            [needlePath addLineToPoint:CGPointMake(FULL_SCALE(center.x, center.y - _needleHeight))];
-            [needlePath closePath];
-
-            needleLayer.path = needlePath.CGPath;
-            needleLayer.backgroundColor = [[UIColor clearColor] CGColor];
-            needleLayer.fillColor = CGRGB(255, 104, 97);
-            needleLayer.strokeColor = CGRGB(255, 104, 97);
-            needleLayer.lineWidth = 1.2;
-            
-            // Needle shadow
-            needleLayer.shadowColor = [[UIColor blackColor] CGColor];
-            needleLayer.shadowOffset = CGSizeMake(-2.0, -2.0);
-            needleLayer.shadowOpacity = 0.2;
-            needleLayer.shadowRadius = 1.2;
-            
-            [rootNeedleLayer addSublayer:needleLayer];
-        }
-        break;
-            
-        default:
-        break;
-    }
-}
-
-/**
- * Needle screw drawing 
- */
-- (void)drawNeedleScrew
-{
-    switch (_needleScrewStyle)
-    {
-        case WMGaugeViewNeedleScrewStyleGradient:
-        {
-            // Screw drawing
-            CAShapeLayer *screwLayer = [CAShapeLayer layer];
-            screwLayer.bounds = CGRectMake(FULL_SCALE(center.x - _needleScrewRadius, center.y - _needleScrewRadius), FULL_SCALE(_needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-            screwLayer.position = CGPointMake(FULL_SCALE(center.x, center.y));
-            screwLayer.path = [UIBezierPath bezierPathWithOvalInRect:screwLayer.bounds].CGPath;
-            screwLayer.fillColor = CGRGB(171, 171, 171);
-            screwLayer.strokeColor = CGRGBA(81, 84, 89, 100);
-            screwLayer.lineWidth = 1.5;
-            
-            // Screw shadow
-            screwLayer.shadowColor = [[UIColor blackColor] CGColor];
-            screwLayer.shadowOffset = CGSizeMake(0.0, 0.0);
-            screwLayer.shadowOpacity = 0.1;
-            screwLayer.shadowRadius = 2.0;
-            
-            [rootNeedleLayer addSublayer:screwLayer];
-        }
-        break;
-            
-        case WMGaugeViewNeedleScrewStylePlain:
-        {
-            // Screw drawing
-            CAShapeLayer *screwLayer = [CAShapeLayer layer];
-            screwLayer.bounds = CGRectMake(FULL_SCALE(center.x - _needleScrewRadius, center.y - _needleScrewRadius), FULL_SCALE(_needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
-            screwLayer.position = CGPointMake(FULL_SCALE(center.x, center.y));
-            screwLayer.path = [UIBezierPath bezierPathWithOvalInRect:screwLayer.bounds].CGPath;
-            screwLayer.fillColor = CGRGB(68, 84, 105);
-            
-            // Screw shadow
-            screwLayer.shadowColor = [[UIColor blackColor] CGColor];
-            screwLayer.shadowOffset = CGSizeMake(0.0, 0.0);
-            screwLayer.shadowOpacity = 0.2;
-            screwLayer.shadowRadius = 2.0;
-            
-            [rootNeedleLayer addSublayer:screwLayer];
-        }
-        break;
-            
-        default:
-        break;
+    if ([_style conformsToProtocol:@protocol(WMGaugeViewStyle)]) {
+        [_style drawNeedleOnLayer:rootNeedleLayer inRect:self.bounds];
     }
 }
 
@@ -603,7 +414,7 @@
 /**
  * Draw curved NSSring in context
  */
-- (void) drawStringAtContext:(CGContextRef) context string:(NSString*)text withCenter:(CGPoint)center_ radius:(CGFloat)radius startAngle:(CGFloat)startAngle endAngle:(CGFloat)endAngle
+- (void)drawStringAtContext:(CGContextRef) context string:(NSString*)text withCenter:(CGPoint)center_ radius:(CGFloat)radius startAngle:(CGFloat)startAngle endAngle:(CGFloat)endAngle
 {
     CGContextSaveGState(context);
     
@@ -611,11 +422,8 @@
     UIColor* color = _rangeLabelsFontColor ? _rangeLabelsFontColor : [UIColor whiteColor];
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
     CGSize textSize;
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-        textSize = [text sizeWithFont:font];
-    } else {
-        textSize = [text sizeWithAttributes:stringAttrs];
-    }
+    textSize = [text sizeWithAttributes:stringAttrs];
+    
     float perimeter = 2 * M_PI * radius;
     float textAngle = textSize.width / perimeter * 2 * M_PI * _rangeLabelsFontKerning;
     float offset = ((endAngle - startAngle) - textAngle) / 2.0;
@@ -629,23 +437,10 @@
         NSRange range = {index, 1};
         NSString* letter = [text substringWithRange:range];
         NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:letter attributes:stringAttrs];
-        CGSize charSize;
-        float totalWidth;
-        float currentLetterWidth;
-        float lastLetterWidth;
-        if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-            charSize = [letter sizeWithFont:font];
-            totalWidth = [[NSString stringWithFormat:@"%@%@", lastLetter, letter] sizeWithFont:font].width;
-            currentLetterWidth = [letter sizeWithFont:font].width;
-            lastLetterWidth = [lastLetter sizeWithFont:font].width;
-        } else {
-            charSize = [letter sizeWithAttributes:stringAttrs];
-            totalWidth = [[NSString stringWithFormat:@"%@%@",lastLetter, letter] sizeWithAttributes:stringAttrs].width;
-            currentLetterWidth = [letter sizeWithAttributes:stringAttrs].width;
-            lastLetterWidth = [lastLetter sizeWithAttributes:stringAttrs].width;
-        }
-
- 
+        CGSize charSize = [letter sizeWithAttributes:stringAttrs];
+        float totalWidth = [[NSString stringWithFormat:@"%@%@",lastLetter, letter] sizeWithAttributes:stringAttrs].width;
+        float currentLetterWidth = [letter sizeWithAttributes:stringAttrs].width;
+        float lastLetterWidth = [lastLetter sizeWithAttributes:stringAttrs].width;
         float kerning = (lastLetterWidth) ? 0.0 : ((currentLetterWidth + lastLetterWidth) - totalWidth);
         
         letterPosition += (charSize.width / 2) - kerning;
@@ -757,14 +552,15 @@
     animation.removedOnCompletion = YES;
     animation.duration = animated ? duration : 0.0;
     animation.delegate = self;
-    animation.values = [NSArray arrayWithObjects:
-                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
-                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
-                        [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)],
-                        nil];
+    animation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
+                         [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
+                         [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)]];
     
-    rootNeedleLayer.transform = [[animation.values lastObject] CATransform3DValue];
-    [rootNeedleLayer addAnimation:animation forKey:kCATransition];
+    if ([_style conformsToProtocol:@protocol(WMGaugeViewStyle)] == NO || [_style needleLayer:rootNeedleLayer willMoveAnimated:animated duration:duration animation:animation] == NO)
+    {
+        rootNeedleLayer.transform = [[animation.values lastObject] CATransform3DValue];
+        [rootNeedleLayer addAnimation:animation forKey:kCATransition];
+    }
 }
 
 #pragma mark - CAAnimation delegate
@@ -806,42 +602,6 @@
 {
     _innerRimBorderWidth = innerRimBorderWidth;
     [self invalidateBackground];
-}
-
-- (void)setInnerBackgroundStyle:(WMGaugeViewInnerBackgroundStyle)innerBackgroundStyle
-{
-    _innerBackgroundStyle = innerBackgroundStyle;
-    [self invalidateBackground];
-}
-
-- (void)setNeedleWidth:(CGFloat)needleWidth
-{
-    _needleWidth = needleWidth;
-    [self invalidateNeedle];
-}
-
-- (void)setNeedleHeight:(CGFloat)needleHeight
-{
-    _needleHeight = needleHeight;
-    [self invalidateNeedle];
-}
-
-- (void)setNeedleScrewRadius:(CGFloat)needleScrewRadius
-{
-    _needleScrewRadius = needleScrewRadius;
-    [self invalidateNeedle];
-}
-
-- (void)setNeedleStyle:(WMGaugeViewNeedleStyle)needleStyle
-{
-    _needleStyle = needleStyle;
-    [self invalidateNeedle];
-}
-
-- (void)setNeedleScrewStyle:(WMGaugeViewNeedleScrewStyle)needleScrewStyle
-{
-    _needleScrewStyle = needleScrewStyle;
-    [self invalidateNeedle];
 }
 
 - (void)setScalePosition:(CGFloat)scalePosition
@@ -1022,6 +782,12 @@
 {
     _rangeLabelsFontColor = rangeLabelsFontColor;
     [self invalidateBackground];
+}
+
+- (void)setStyle:(id<WMGaugeViewStyle>)style {
+    _style = style;
+    [self invalidateBackground];
+    [self invalidateNeedle];
 }
 
 @end

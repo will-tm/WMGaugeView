@@ -24,6 +24,7 @@
 {
     [super viewDidLoad];
     
+    _gaugeView.style = [WMGaugeViewStyle3D new];
     _gaugeView.maxValue = 240.0;
     _gaugeView.showRangeLabels = YES;
     _gaugeView.rangeValues = @[ @50,                  @90,                @130,               @240.0              ];
@@ -37,12 +38,12 @@
     _gaugeView.rangeLabelsWidth = 0.04;
     _gaugeView.rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.04];
     
+    _gaugeView2.style = [WMGaugeViewStyleFlatThin new];
     _gaugeView2.maxValue = 100.0;
     _gaugeView2.scaleDivisions = 10;
     _gaugeView2.scaleSubdivisions = 5;
     _gaugeView2.scaleStartAngle = 30;
     _gaugeView2.scaleEndAngle = 280;
-    _gaugeView2.innerBackgroundStyle = WMGaugeViewInnerBackgroundStyleFlat;
     _gaugeView2.showScaleShadow = NO;
     _gaugeView2.scaleFont = [UIFont fontWithName:@"AvenirNext-UltraLight" size:0.065];
     _gaugeView2.scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentCenter;
@@ -50,11 +51,6 @@
     _gaugeView2.scaleSubdivisionsLength = 0.04;
     _gaugeView2.scaleDivisionsWidth = 0.007;
     _gaugeView2.scaleDivisionsLength = 0.07;
-    _gaugeView2.needleStyle = WMGaugeViewNeedleStyleFlatThin;
-    _gaugeView2.needleWidth = 0.012;
-    _gaugeView2.needleHeight = 0.4;
-    _gaugeView2.needleScrewStyle = WMGaugeViewNeedleScrewStylePlain;
-    _gaugeView2.needleScrewRadius = 0.05;
     
     [NSTimer scheduledTimerWithTimeInterval:2.0
                                      target:self

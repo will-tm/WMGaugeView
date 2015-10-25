@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E788DD61BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E788DD51BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.m */; };
+		3E788DDF1BDCF58300F78D6A /* WMGaugeViewStyle3D.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E788DDE1BDCF58300F78D6A /* WMGaugeViewStyle3D.m */; };
+		3E788DE21BDCFE7F00F78D6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E788DE01BDCFE7F00F78D6A /* LaunchScreen.storyboard */; };
 		BE18403519197AE8002ACE81 /* WMGaugeView.m in Sources */ = {isa = PBXBuildFile; fileRef = BE18403419197AE8002ACE81 /* WMGaugeView.m */; };
 		BEE4441D189846A9002B489A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE4441C189846A9002B489A /* Foundation.framework */; };
 		BEE4441F189846A9002B489A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE4441E189846A9002B489A /* CoreGraphics.framework */; };
@@ -35,6 +38,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3E788DD41BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMGaugeViewStyleFlatThin.h; sourceTree = "<group>"; };
+		3E788DD51BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMGaugeViewStyleFlatThin.m; sourceTree = "<group>"; };
+		3E788DD71BDCEB0200F78D6A /* WMGaugeViewStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMGaugeViewStyle.h; sourceTree = "<group>"; };
+		3E788DDD1BDCF58300F78D6A /* WMGaugeViewStyle3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMGaugeViewStyle3D.h; sourceTree = "<group>"; };
+		3E788DDE1BDCF58300F78D6A /* WMGaugeViewStyle3D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMGaugeViewStyle3D.m; sourceTree = "<group>"; };
+		3E788DE11BDCFE7F00F78D6A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE18403319197AE8002ACE81 /* WMGaugeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMGaugeView.h; sourceTree = "<group>"; };
 		BE18403419197AE8002ACE81 /* WMGaugeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMGaugeView.m; sourceTree = "<group>"; };
 		BEE44419189846A9002B489A /* WMGaugeView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WMGaugeView.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,6 +96,11 @@
 			children = (
 				BE18403319197AE8002ACE81 /* WMGaugeView.h */,
 				BE18403419197AE8002ACE81 /* WMGaugeView.m */,
+				3E788DD71BDCEB0200F78D6A /* WMGaugeViewStyle.h */,
+				3E788DD41BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.h */,
+				3E788DD51BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.m */,
+				3E788DDD1BDCF58300F78D6A /* WMGaugeViewStyle3D.h */,
+				3E788DDE1BDCF58300F78D6A /* WMGaugeViewStyle3D.m */,
 			);
 			name = WMGaugeView;
 			path = ../../WMGaugeView;
@@ -129,6 +143,7 @@
 				BEE4442B189846A9002B489A /* AppDelegate.h */,
 				BEE4442C189846A9002B489A /* AppDelegate.m */,
 				BEE4442E189846A9002B489A /* Main.storyboard */,
+				3E788DE01BDCFE7F00F78D6A /* LaunchScreen.storyboard */,
 				BEE44431189846A9002B489A /* ViewController.h */,
 				BEE44432189846A9002B489A /* ViewController.m */,
 				BEE44434189846A9002B489A /* Images.xcassets */,
@@ -210,7 +225,7 @@
 		BEE44411189846A9002B489A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Will™";
 				TargetAttributes = {
 					BEE44439189846A9002B489A = {
@@ -243,6 +258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEE44435189846A9002B489A /* Images.xcassets in Resources */,
+				3E788DE21BDCFE7F00F78D6A /* LaunchScreen.storyboard in Resources */,
 				BEE44427189846A9002B489A /* InfoPlist.strings in Resources */,
 				BEE44430189846A9002B489A /* Main.storyboard in Resources */,
 			);
@@ -266,7 +282,9 @@
 				BE18403519197AE8002ACE81 /* WMGaugeView.m in Sources */,
 				BEE44433189846A9002B489A /* ViewController.m in Sources */,
 				BEE4442D189846A9002B489A /* AppDelegate.m in Sources */,
+				3E788DDF1BDCF58300F78D6A /* WMGaugeViewStyle3D.m in Sources */,
 				BEE44429189846A9002B489A /* main.m in Sources */,
+				3E788DD61BDCEAC500F78D6A /* WMGaugeViewStyleFlatThin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +307,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		3E788DE01BDCFE7F00F78D6A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3E788DE11BDCFE7F00F78D6A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		BEE44425189846A9002B489A /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -334,6 +360,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -348,7 +375,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -380,7 +407,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -390,10 +417,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WMGaugeView/WMGaugeView-Prefix.pch";
 				INFOPLIST_FILE = "WMGaugeView/WMGaugeView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.will-tm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -403,10 +430,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WMGaugeView/WMGaugeView-Prefix.pch";
 				INFOPLIST_FILE = "WMGaugeView/WMGaugeView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.will-tm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -428,6 +455,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "WMGaugeViewTests/WMGaugeViewTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.will-tm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -446,6 +474,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WMGaugeView/WMGaugeView-Prefix.pch";
 				INFOPLIST_FILE = "WMGaugeViewTests/WMGaugeViewTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.will-tm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

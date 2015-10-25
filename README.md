@@ -120,7 +120,16 @@ You can customize the following properties of `WMGaugeView`:
 @property (nonatomic, readwrite, assign) bool showUnitOfMeasurement;
 ```
 
-Drawing is handled by style protocols in order to provide easy customization of background and needle.
+Drawing is handled by style protocols in order to provide easy customization of background and needle :
+``` objective-c
+@protocol WMGaugeViewStyle <NSObject>
+@required
+- (void)drawNeedleOnLayer:(CALayer*)layer inRect:(CGRect)rect;
+- (void)drawFaceWithContext:(CGContextRef)context inRect:(CGRect)rect;
+- (BOOL)needleLayer:(CALayer*)layer willMoveAnimated:(BOOL)animated duration:(NSTimeInterval)duration animation:(CAKeyframeAnimation*)animation;
+
+@end
+```
 
 ## Authors
 

@@ -80,6 +80,7 @@
     _scaleDivisionsWidth = 0.01;
     _scaleSubdivisionsLength = 0.015;
     _scaleSubdivisionsWidth = 0.01;
+    _scaleFont = [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
     
     _value = 0.0;
     _minValue = 0.0;
@@ -262,10 +263,11 @@
         
         float value = [self valueForTick:i];
         float div = (_maxValue - _minValue) / _scaleDivisions;
-        float mod = (int)value % (int)div;
+        float divisionsForValue = (value - _minValue) / div;
+        float mod = divisionsForValue - floorf(divisionsForValue);
         
         // Division
-        if ((fabsf(mod - 0) < 0.000001) || (fabsf(mod - div) < 0.000001))
+        if ((fabsf(mod - 0) <= CGFLOAT_MIN) || (fabsf(mod - div) <= CGFLOAT_MIN))
         {
             // Initialize Core Graphics settings
             UIColor *color = (_rangeValues && _rangeColors) ? [self rangeColorForValue:value] : _scaleDivisionColor;
@@ -279,14 +281,16 @@
             CGContextStrokePath(context);
             
             // Draw label
-            NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
-            UIFont* font = _scaleFont ? _scaleFont : [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
-            NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
-            NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
-            CGSize fontWidth;
-            fontWidth = [valueString sizeWithAttributes:stringAttrs];
-            
-            [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, y3 + 0.005)];
+            if (_scaleFont) {
+                NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
+                UIFont* font = _scaleFont;
+                NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
+                NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
+                CGSize fontWidth;
+                fontWidth = [valueString sizeWithAttributes:stringAttrs];
+                
+                [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, y3 + 0.005)];
+            }
         }
         // Subdivision
         else

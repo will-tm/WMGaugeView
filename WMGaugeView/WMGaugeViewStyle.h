@@ -6,6 +6,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 /* Degrees to radians conversion macro */
 #define DEGREES_TO_RADIANS(degrees) (degrees) / 180.0 * M_PI

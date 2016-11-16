@@ -10,4 +10,23 @@
 
 @interface WMGaugeViewStyle3D : NSObject<WMGaugeViewStyle>
 
+@property (nonatomic) CGFloat needleWidth;
+@property (nonatomic) CGFloat needleHeight;
+@property (nonatomic) CGFloat needleScrewRadius;
+
+@property (nonatomic) UIColor* leftNeedleColor;
+@property (nonatomic) UIColor* rightNeedleColor;
+
+@property (nonatomic) UIColor* screwFillColor;
+@property (nonatomic) UIColor* screwStrokeColor;
+
+@property (nonatomic) UIColor* borderColor;
+@property (nonatomic) CGFloat borderWidth;
+
+@property (nonatomic) NSArray<UIColor*>* faceGradientColors;
+@property (nonatomic) NSArray<NSNumber*>* faceGradientPositions;
+@property (nonatomic) NSArray<UIColor*>* faceShadowColors;
+@property (nonatomic) NSArray<NSNumber*>* faceShadowPositions;
+
 @end
+

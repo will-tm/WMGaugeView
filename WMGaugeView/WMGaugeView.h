@@ -13,13 +13,11 @@
 /**
  * Styling enumerations
  */
-typedef enum
-{
+typedef NS_ENUM(NSUInteger, WMGaugeViewSubdivisionsAlignment) {
     WMGaugeViewSubdivisionsAlignmentTop,
     WMGaugeViewSubdivisionsAlignmentCenter,
     WMGaugeViewSubdivisionsAlignmentBottom
-}
-WMGaugeViewSubdivisionsAlignment;
+};
 
 /**
  * WMGaugeView class

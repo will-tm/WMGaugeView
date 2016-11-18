@@ -55,9 +55,9 @@ typedef NS_ENUM(NSUInteger, WMGaugeViewSubdivisionsAlignment) {
 @property (nonatomic, readwrite, strong) UIFont *rangeLabelsFont;
 @property (nonatomic, readwrite, strong) UIColor *rangeLabelsFontColor;
 @property (nonatomic, readwrite, assign) CGFloat rangeLabelsFontKerning;
-@property (nonatomic, readwrite, strong) NSArray *rangeValues;
-@property (nonatomic, readwrite, strong) NSArray *rangeColors;
-@property (nonatomic, readwrite, strong) NSArray *rangeLabels;
+@property (nonatomic, readwrite, strong) NSArray<NSNumber*> *rangeValues;
+@property (nonatomic, readwrite, strong) NSArray<UIColor*> *rangeColors;
+@property (nonatomic, readwrite, strong) NSArray<NSString*> *rangeLabels;
 @property (nonatomic, readwrite, strong) UIColor *unitOfMeasurementColor;
 @property (nonatomic, readwrite, assign) CGFloat unitOfMeasurementVerticalOffset;
 @property (nonatomic, readwrite, strong) UIFont *unitOfMeasurementFont;

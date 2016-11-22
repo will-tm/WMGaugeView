@@ -53,6 +53,7 @@ typedef NS_ENUM(NSUInteger, WMGaugeViewSubdivisionsAlignment) {
 @property (nonatomic, readwrite, assign) bool showRangeLabels;
 @property (nonatomic, readwrite, assign) CGFloat rangeLabelsWidth;
 @property (nonatomic, readwrite, strong) UIFont *rangeLabelsFont;
+@property (nonatomic, readwrite, assign) BOOL adjustRangeLabelSizeToFitWidth;
 @property (nonatomic, readwrite, strong) UIColor *rangeLabelsFontColor;
 @property (nonatomic, readwrite, assign) CGFloat rangeLabelsFontKerning;
 @property (nonatomic, readwrite, strong) NSArray<NSNumber*> *rangeValues;

@@ -92,6 +92,7 @@
     _showRangeLabels = NO;
     _rangeLabelsWidth = 0.05;
     _rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.05];
+    _adjustRangeLabelSizeToFitWidth = NO;
     _rangeLabelsFontColor = [UIColor whiteColor];
     _rangeLabelsFontKerning = 1.0;
     _rangeValues = nil;
@@ -424,9 +425,26 @@
     
     UIFont* font = _rangeLabelsFont ? _rangeLabelsFont : [UIFont fontWithName:@"Helvetica" size:0.05];
     UIColor* color = _rangeLabelsFontColor ? _rangeLabelsFontColor : [UIColor whiteColor];
+
+    //add extra character to ensure there is some padding
+    NSString* testText = [text stringByAppendingString:@"$"];
+    while(_adjustRangeLabelSizeToFitWidth) {
+    
+        CGFloat maxWidth = radius * (endAngle - startAngle);
+        CGSize textSize = [testText boundingRectWithSize:CGSizeMake(maxWidth, CGFLOAT_MAX)
+                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                   attributes:@{NSFontAttributeName: font}
+                                       context:nil].size;
+
+        if(textSize.height < _rangeLabelsWidth) {
+            break;
+        }
+        
+        font = [font fontWithSize:font.pointSize * 0.9];
+    }
+    
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
-    CGSize textSize;
-    textSize = [text sizeWithAttributes:stringAttrs];
+    CGSize textSize = [text sizeWithAttributes:stringAttrs];
     
     float perimeter = 2 * M_PI * radius;
     float textAngle = textSize.width / perimeter * 2 * M_PI * _rangeLabelsFontKerning;

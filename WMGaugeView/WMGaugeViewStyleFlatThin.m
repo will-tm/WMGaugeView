@@ -8,16 +8,6 @@
 
 #import "WMGaugeViewStyleFlatThin.h"
 
-#define kNeedleWidth        0.012
-#define kNeedleHeight       0.4
-#define kNeedleScrewRadius  0.05
-
-#define kCenterX            0.5
-#define kCenterY            0.5
-
-#define kNeedleColor        CGRGB(255, 104, 97)
-#define kNeedleScrewColor   CGRGB(68, 84, 105)
-
 @interface WMGaugeViewStyleFlatThin ()
 
 @property (nonatomic) CAShapeLayer *needleLayer;
@@ -26,19 +16,40 @@
 
 @implementation WMGaugeViewStyleFlatThin
 
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _needleWidth = 0.012;
+        _needleHeight = 0.4;
+        _needleScrewRadius = 0.05;
+        _needleColor = RGB(255, 104, 97);
+        _needleScrewColor = RGB(68, 84, 105);
+        
+        _externalRingRadius = 0.24;
+        _externalFaceColor = RGB(255, 104, 97);
+
+        _internalRingRadius = 0.1;
+        _internalFaceColor = RGB(242, 99, 92);
+        
+        _borderColor = RGBA(81, 84, 89, 160);
+        _borderWidth = 0;
+    }
+    return self;
+}
+
 - (void)drawNeedleOnLayer:(CALayer*)layer inRect:(CGRect)rect
 {
     _needleLayer = [CAShapeLayer layer];
     UIBezierPath *needlePath = [UIBezierPath bezierPath];
-    [needlePath moveToPoint:CGPointMake(FULLSCALE(kCenterX - kNeedleWidth, kCenterY))];
-    [needlePath addLineToPoint:CGPointMake(FULLSCALE(kCenterX + kNeedleWidth, kCenterY))];
-    [needlePath addLineToPoint:CGPointMake(FULLSCALE(kCenterX, kCenterY - kNeedleHeight))];
+    [needlePath moveToPoint:CGPointMake(FULLSCALE(kCenterX - _needleWidth, kCenterY))];
+    [needlePath addLineToPoint:CGPointMake(FULLSCALE(kCenterX + _needleWidth, kCenterY))];
+    [needlePath addLineToPoint:CGPointMake(FULLSCALE(kCenterX, kCenterY - _needleHeight))];
     [needlePath closePath];
     
     _needleLayer.path = needlePath.CGPath;
     _needleLayer.backgroundColor = [[UIColor clearColor] CGColor];
-    _needleLayer.fillColor = kNeedleColor;
-    _needleLayer.strokeColor = kNeedleColor;
+    _needleLayer.fillColor = _needleColor.CGColor;
+    _needleLayer.strokeColor = _needleColor.CGColor;
     _needleLayer.lineWidth = 1.2;
     
     // Needle shadow
@@ -51,10 +62,10 @@
     
     // Screw drawing
     CAShapeLayer *screwLayer = [CAShapeLayer layer];
-    screwLayer.bounds = CGRectMake(FULLSCALE(kCenterX - kNeedleScrewRadius, kCenterY - kNeedleScrewRadius), FULLSCALE(kNeedleScrewRadius * 2.0, kNeedleScrewRadius * 2.0));
+    screwLayer.bounds = CGRectMake(FULLSCALE(kCenterX - _needleScrewRadius, kCenterY - _needleScrewRadius), FULLSCALE(_needleScrewRadius * 2.0, _needleScrewRadius * 2.0));
     screwLayer.position = CGPointMake(FULLSCALE(kCenterX, kCenterY));
     screwLayer.path = [UIBezierPath bezierPathWithOvalInRect:screwLayer.bounds].CGPath;
-    screwLayer.fillColor = kNeedleScrewColor;
+    screwLayer.fillColor = _needleScrewColor.CGColor;
     
     // Screw shadow
     screwLayer.shadowColor = [[UIColor blackColor] CGColor];
@@ -67,18 +78,21 @@
 
 - (void)drawFaceWithContext:(CGContextRef)context inRect:(CGRect)rect
 {
-#define EXTERNAL_RING_RADIUS    0.24
-#define INTERNAL_RING_RADIUS    0.1
-    
     // External circle
-    CGContextAddEllipseInRect(context, CGRectMake(kCenterX - EXTERNAL_RING_RADIUS, kCenterY - EXTERNAL_RING_RADIUS, EXTERNAL_RING_RADIUS * 2.0, EXTERNAL_RING_RADIUS * 2.0));
-    CGContextSetFillColorWithColor(context, CGRGB(255, 104, 97));
-    CGContextFillPath(context);
-    
+    CGRect externalRect = CGRectMake(kCenterX - _externalRingRadius, kCenterY - _externalRingRadius, _externalRingRadius * 2.0, _externalRingRadius * 2.0);
+    CGContextSetFillColorWithColor(context, _externalFaceColor.CGColor);
+    CGContextFillEllipseInRect(context, externalRect);
+
     // Inner circle
-    CGContextAddEllipseInRect(context, CGRectMake(kCenterX - INTERNAL_RING_RADIUS, kCenterY - INTERNAL_RING_RADIUS, INTERNAL_RING_RADIUS * 2.0, INTERNAL_RING_RADIUS * 2.0));
-    CGContextSetFillColorWithColor(context, CGRGB(242, 99, 92));
-    CGContextFillPath(context);
+    CGRect internalRect = CGRectMake(kCenterX - _internalRingRadius, kCenterY - _internalRingRadius, _internalRingRadius * 2.0, _internalRingRadius * 2.0);
+    CGContextSetFillColorWithColor(context, _internalFaceColor.CGColor);
+    CGContextFillEllipseInRect(context, internalRect);
+    
+    // Border
+    CGRect borderRect = CGRectInset(rect, _borderWidth * 0.5, _borderWidth * 0.5);
+    CGContextSetLineWidth(context, _borderWidth);
+    CGContextSetStrokeColorWithColor(context, _borderColor.CGColor);
+    CGContextStrokeEllipseInRect(context, borderRect);
 }
 
 - (BOOL)needleLayer:(CALayer*)layer willMoveAnimated:(BOOL)animated duration:(NSTimeInterval)duration animation:(CAKeyframeAnimation*)animation

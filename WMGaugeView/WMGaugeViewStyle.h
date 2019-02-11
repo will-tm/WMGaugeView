@@ -19,6 +19,24 @@
 #define CGRGBA(r,g,b,a) RGBA(r,g,b,a).CGColor
 #define iCGRGBA(r,g,b,a) (id)CGRGBA(r,g,b,a)
 
+static inline
+NSArray* CGColorArray(NSArray<UIColor*>*c) {
+    NSMutableArray* _c = [NSMutableArray array];
+    for(UIColor* col in c) {
+        [_c addObject: (id)col.CGColor];
+    }
+    return _c.copy;
+}
+
+static inline
+CGFloat* CGFloatCArray(NSArray<NSNumber*>*a) {
+    CGFloat* ar = malloc(sizeof(*ar) * a.count);
+    [a enumerateObjectsUsingBlock:^(NSNumber* obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        ar[idx] = (CGFloat)obj.doubleValue;
+    }];
+    return ar;
+}
+
 /* Position macros */
 #define FULL_RECT           CGRectMake(0.0, 0.0, 1.0, 1.0)
 #define kCenterX            0.5

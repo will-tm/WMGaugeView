@@ -53,6 +53,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self initialize];
 }
 
@@ -75,6 +76,7 @@
     _scaleSubdivisions = 10.0;
     _showScale = YES;
     _showScaleShadow = YES;
+    _showScaleValues = YES;
     _scalesubdivisionsAligment = WMGaugeViewSubdivisionsAlignmentTop;
     _scaleDivisionsLength = 0.045;
     _scaleDivisionsWidth = 0.01;
@@ -90,6 +92,7 @@
     _showRangeLabels = NO;
     _rangeLabelsWidth = 0.05;
     _rangeLabelsFont = [UIFont fontWithName:@"Helvetica" size:0.05];
+    _adjustRangeLabelSizeToFitWidth = NO;
     _rangeLabelsFontColor = [UIColor whiteColor];
     _rangeLabelsFontKerning = 1.0;
     _rangeValues = nil;
@@ -279,14 +282,16 @@
             CGContextStrokePath(context);
             
             // Draw label
-            NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
-            UIFont* font = _scaleFont ? _scaleFont : [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
-            NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
-            NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
-            CGSize fontWidth;
-            fontWidth = [valueString sizeWithAttributes:stringAttrs];
-            
-            [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, y3 + 0.005)];
+            if(_showScaleValues) {
+                NSString *valueString = [NSString stringWithFormat:@"%0.0f",value];
+                UIFont* font = _scaleFont ? _scaleFont : [UIFont fontWithName:@"Helvetica-Bold" size:0.05];
+                NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
+                NSAttributedString* attrStr = [[NSAttributedString alloc] initWithString:valueString attributes:stringAttrs];
+                CGSize fontWidth;
+                fontWidth = [valueString sizeWithAttributes:stringAttrs];
+                
+                [attrStr drawAtPoint:CGPointMake(0.5 - fontWidth.width / 2.0, y3 + 0.005)];
+            }
         }
         // Subdivision
         else
@@ -420,9 +425,26 @@
     
     UIFont* font = _rangeLabelsFont ? _rangeLabelsFont : [UIFont fontWithName:@"Helvetica" size:0.05];
     UIColor* color = _rangeLabelsFontColor ? _rangeLabelsFontColor : [UIColor whiteColor];
+
+    //add extra character to ensure there is some padding
+    NSString* testText = [text stringByAppendingString:@"$"];
+    while(_adjustRangeLabelSizeToFitWidth) {
+    
+        CGFloat maxWidth = radius * (endAngle - startAngle);
+        CGSize textSize = [testText boundingRectWithSize:CGSizeMake(maxWidth, CGFLOAT_MAX)
+                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                   attributes:@{NSFontAttributeName: font}
+                                       context:nil].size;
+
+        if(textSize.height < _rangeLabelsWidth) {
+            break;
+        }
+        
+        font = [font fontWithSize:font.pointSize * 0.9];
+    }
+    
     NSDictionary* stringAttrs = @{ NSFontAttributeName : font, NSForegroundColorAttributeName : color };
-    CGSize textSize;
-    textSize = [text sizeWithAttributes:stringAttrs];
+    CGSize textSize = [text sizeWithAttributes:stringAttrs];
     
     float perimeter = 2 * M_PI * radius;
     float textAngle = textSize.width / perimeter * 2 * M_PI * _rangeLabelsFontKerning;
@@ -551,7 +573,7 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     animation.removedOnCompletion = YES;
     animation.duration = animated ? duration : 0.0;
-    animation.delegate = self;
+    animation.delegate = (id<CAAnimationDelegate>)self;
     animation.values = @[[NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:lastValue]  , 0, 0, 1.0)],
                          [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:middleValue], 0, 0, 1.0)],
                          [NSValue valueWithCATransform3D:CATransform3DMakeRotation([self needleAngleForValue:_value]     , 0, 0, 1.0)]];
@@ -643,6 +665,11 @@
 - (void)setShowScale:(bool)showScale
 {
     _showScale = showScale;
+    [self invalidateBackground];
+}
+
+-(void)setShowScaleValues:(bool)showScaleValues {
+    _showScaleValues = showScaleValues;
     [self invalidateBackground];
 }
 

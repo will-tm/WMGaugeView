@@ -13,13 +13,11 @@
 /**
  * Styling enumerations
  */
-typedef enum
-{
+typedef NS_ENUM(NSUInteger, WMGaugeViewSubdivisionsAlignment) {
     WMGaugeViewSubdivisionsAlignmentTop,
     WMGaugeViewSubdivisionsAlignmentCenter,
     WMGaugeViewSubdivisionsAlignmentBottom
-}
-WMGaugeViewSubdivisionsAlignment;
+};
 
 /**
  * WMGaugeView class
@@ -40,6 +38,7 @@ WMGaugeViewSubdivisionsAlignment;
 @property (nonatomic, readwrite, assign) CGFloat scaleSubdivisions;
 @property (nonatomic, readwrite, assign) bool showScaleShadow;
 @property (nonatomic, readwrite, assign) bool showScale;
+@property (nonatomic, readwrite, assign) bool showScaleValues;
 @property (nonatomic, readwrite, assign) WMGaugeViewSubdivisionsAlignment scalesubdivisionsAligment;
 @property (nonatomic, readwrite, assign) CGFloat scaleDivisionsLength;
 @property (nonatomic, readwrite, assign) CGFloat scaleDivisionsWidth;
@@ -54,11 +53,12 @@ WMGaugeViewSubdivisionsAlignment;
 @property (nonatomic, readwrite, assign) bool showRangeLabels;
 @property (nonatomic, readwrite, assign) CGFloat rangeLabelsWidth;
 @property (nonatomic, readwrite, strong) UIFont *rangeLabelsFont;
+@property (nonatomic, readwrite, assign) BOOL adjustRangeLabelSizeToFitWidth;
 @property (nonatomic, readwrite, strong) UIColor *rangeLabelsFontColor;
 @property (nonatomic, readwrite, assign) CGFloat rangeLabelsFontKerning;
-@property (nonatomic, readwrite, strong) NSArray *rangeValues;
-@property (nonatomic, readwrite, strong) NSArray *rangeColors;
-@property (nonatomic, readwrite, strong) NSArray *rangeLabels;
+@property (nonatomic, readwrite, strong) NSArray<NSNumber*> *rangeValues;
+@property (nonatomic, readwrite, strong) NSArray<UIColor*> *rangeColors;
+@property (nonatomic, readwrite, strong) NSArray<NSString*> *rangeLabels;
 @property (nonatomic, readwrite, strong) UIColor *unitOfMeasurementColor;
 @property (nonatomic, readwrite, assign) CGFloat unitOfMeasurementVerticalOffset;
 @property (nonatomic, readwrite, strong) UIFont *unitOfMeasurementFont;

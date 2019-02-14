@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "WMGaugeView"
-  s.version      = "0.0.4"
+  s.version      = "0.0.5"
   s.platform     = :ios
   s.summary      = "Highly customizable gauge control for iOS."
   s.homepage     = "https://github.com/Will-tm/WMGaugeView"
